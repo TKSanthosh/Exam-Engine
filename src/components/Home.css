@@ -1,0 +1,46 @@
+.candidate_details td{
+    font-size: 13px;
+    padding: 5px 10px;
+
+}
+.candidate_details th{
+    font-size: 15px;
+    text-align: left !important;
+}
+.candidate_details {
+    margin-top: 20px;
+}
+.candidateinfo{
+    padding: 60px 0px 0px 40px;
+}
+.box{
+    margin-top: 30px !important;
+}
+ 
+.leftpane{
+    
+    border-right: 1px solid;
+    margin-right: 10px;
+    width: 48%;
+    margin: 10px 10px;
+
+}
+.rightpane{
+    padding: 50px;
+}
+
+hr{
+    margin: 0px;
+    padding: 5px 0px 5px 0px !important;
+}
+
+.btn-primary{
+    margin-top: -20px;
+    border: 1px solid yellowgreen;
+    margin-left: 15px;
+}
+.btn-primary:hover{
+ background-color: yellowgreen !important;
+ color:white; 
+ border:1px solid yellowgreen;
+}

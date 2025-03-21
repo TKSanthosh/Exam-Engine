@@ -1,0 +1,170 @@
+/* Activate.css */
+/* .card {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 400px;
+    text-align: center;
+    margin: 25px 370px;
+    height: 215px;
+} */
+
+.switch-container {
+    bottom: -15px !important;
+    position: absolute;
+    left: 10px;
+    /* background: red; */
+    width: 400px;
+
+}
+
+
+.card-container {
+    position: relative;
+    width: 250px;
+    height: 270px;
+    right: 6.8%;
+}
+.card {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 400px;
+    text-align: center;
+    /* margin: 25px 370px; */
+    height: 215px;
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+    transform: translateX(100%);
+    position: absolute;
+
+}
+.card-show {
+    opacity: 1;
+    transform: translateX(0);
+    /* display: block; */
+}
+
+.card-hide {
+    opacity: 0;
+    transform: translateX(-100%);
+    display: none;
+}
+.disabled{
+    cursor: not-allowed !important;
+    
+}
+.msg-space{
+    height: 150px;
+    /* background: red; */
+
+}
+.loader {
+    border: 5px solid #f3f3f3; /* Light grey */
+    border-top: 5px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    margin: 14px 0px;
+  }
+
+  .loader1,.loader2,.loader3 {
+    border: 5px solid #f3f3f3; /* Light grey */
+    border-top: 5px solid #209608; /* Blue */
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    animation: spin 1s linear infinite;
+    margin: 20px 0px;
+  }
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.button-activated,.button-activated:hover{
+    background-color: #b9d211; /* Green */
+    color: white;
+    border: none;
+    /* padding: 10px 20px; */
+    border-radius: 5px;
+    cursor: not-allowed;
+}
+
+.button-data-download{
+    background: linear-gradient(90deg, #aaaeb3, #c1c671, #d8df30, #b9d211);
+    background-size: 300% 300%;
+    color: white;
+    border: none;
+    /* padding: 10px 20px; */
+    border-radius: 5px; 
+    animation: gradientTransition 2s ease infinite;
+}
+
+.button-activating {
+    background: linear-gradient(90deg, #aaaeb3, #c1c671, #d8df30, #b9d211);
+    background-size: 300% 300%;
+    color: white;
+    border: none;
+    /* padding: 10px 20px; */
+    border-radius: 5px;
+    cursor: not-allowed !important;
+    animation: gradientTransition 2s ease infinite;
+}
+.button-import{
+    cursor: pointer;
+    margin-top: 16px !important;
+    
+}
+@keyframes gradientTransition {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes fadeInOut {
+    0%, 100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
+
+.fade-text {
+    animation: fadeInOut 3s infinite; /* 5s for the duration, infinite for looping */
+    bottom: 110px;
+    position: absolute;
+    left: 115px;
+}
+.fade-text-1 {
+    animation: fadeInOut 3s infinite; /* 5s for the duration, infinite for looping */
+    bottom: 110px;
+    position: absolute;
+    left: 10px;
+}
+
+.active-disabled{
+    cursor: not-allowed !important;
+}
+.active-btn{
+    margin-top: 16px;
+}
+
+.active-btn-margin-bottom{
+ margin-bottom: 8%;
+}
+.active-btn-disabled{
+    padding: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    margin-top: 16px !important;
+    cursor: not-allowed !important;
+}

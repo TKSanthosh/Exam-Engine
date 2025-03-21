@@ -1,0 +1,2 @@
+[4:14:03 pm] Internet Status: On, Speed Level: Slow
+[4:14:03 pm] Internet Status: Off, Speed Level: ---

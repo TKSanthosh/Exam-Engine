@@ -1,0 +1,33 @@
+/* In your CSS file */
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    max-width: 80%;
+    max-height: 80%;
+    overflow: auto;
+    display: none; /* Hidden by default */
+}
+
+.modal.show {
+    display: block; /* Show when modal is open */
+}
+
+.modal button {
+    margin: 5px;
+}
+.rough-btn{
+    cursor: pointer;
+}
+
+.rough-btn:hover{
+    height: 22px !important;
+    width: 22px !important;
+    transition: width 0.2s ease-in-out, height 0.2s ease-in-out;
+}

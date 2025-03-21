@@ -1,0 +1,260 @@
+/* .number-palette { */
+    /* right: 1vw; */
+    /* position: absolute; */
+    /* display: flex; */
+    /* flex-wrap: wrap; */
+    /* margin-bottom: 20px; */
+    /* width: 25vw; */
+    /* height: 220px; */
+    /* height: 35vh; */
+    /* background: #dedede; */
+    /* padding: 10px 10px; */
+    /* top: 282px; */
+    /* margin-top: 6%; */
+    /* border-radius: 5px; */
+  /* } */
+
+  .headingSection{
+    height: 7%;
+    overflow-wrap: break-word;
+
+  }
+  .number-palette {
+    display: flex;
+    flex-wrap: wrap;
+    width: 25vw;
+    height: 39%;
+    background: #dedede;
+    border-radius: 5px;
+    position: absolute; 
+    border-radius: 9px; 
+    box-shadow: 1px 1px 10px #0000006b;
+  }
+  .titlenumber{
+    font-weight: 600;
+    font-size: small;
+    margin-top: 0px;
+    position: absolute;
+
+  }
+  /* .numbersection {
+    padding: 0px 13px;
+    height: 60%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    top: 35px;
+    position: absolute;
+    scrollbar-gutter: stable;
+} */
+/* .numbersection {
+  display:flex;
+  padding: 0px 1vw;
+  height: 55%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  /* top: 30px; */
+  /* position: absolute; */
+  /* width: 100%; Ensure it takes full width */
+  /* scrollbar-gutter: stable; */
+/* } */ 
+
+.numbersection {
+  display: flex;         /* Use flexbox */
+  flex-wrap: wrap;       /* Allow wrapping to the next row */
+  justify-content: space-between; /* Adjust spacing */
+  align-content: flex-start; /* Align rows at the top */
+  padding: 0px 1vw;
+  height: 55%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%; /* Ensure it takes full width */
+  /* scrollbar-gutter: stable; */
+  gap: 0px; /* Remove any gaps */
+}
+
+.numbersection button{
+  flex: 1 1 calc(16.66% - 8px); /* Ensures even button distribution */
+  max-width: 100px;
+  min-width: 50px;
+}
+.button-container{
+  display: flex;
+  justify-content: space-between;
+  flex-grow: 1; /* Adjust width */
+
+}
+
+.status-container {
+  font-size: 0.7rem;
+  /* margin-top: -20px; */
+  width: 100%;
+  height: 15%;
+  display: flex;  
+  flex-direction: row;
+  justify-content: space-between;
+  flex-shrink: 1;
+}
+
+.status-item {
+  display: flex;
+  flex-shrink: 1;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  /* flex-wrap: wrap; */
+}
+
+.status-container button {
+  flex-shrink: 1;
+  flex-wrap: wrap;
+}
+.status-labels {
+  display: flex;
+  justify-content: space-around;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-align: center;
+  width: 100%;
+  max-width: 400px; /* Prevents labels from spreading too much */
+}
+
+/* .status-labels span {
+  flex: 1;
+  min-width: 80px; /* Prevents text overlap */
+/* }  */
+
+@media screen and (max-width: 60em) {
+
+  .answeredDiv::after {
+    content: "A";
+  }
+  .taggedDiv::after {
+    content: "T";
+  }
+  .tagansweredDiv::after {
+    content: "TA";
+  }
+  .unattemptDiv::after {
+    content: "U";
+  }
+  .titleCalc::after{
+    content: "No of Quest";
+    font-weight: 600;
+    font-size: small;
+    margin-top: 0px;
+    position: absolute;
+  }
+
+  .numbersection {
+    height: 20vh; /* Ensure it's relative to viewport height */
+  }  
+  /* Hide the original text */
+  .status-item span {
+    display: none;
+  }
+  .titlenumber{
+    display: none;
+  }
+}
+
+
+
+/* Moves the scrollbar 10px to the left */
+.numbersection::-webkit-scrollbar {
+    width: 8px; /* Adjust scrollbar width */
+    margin-left: -100px;
+}
+
+.numbersection::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    margin-left: -100px;
+}
+
+.numbersection::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+    margin-left: -100px;
+}
+
+.numbersection::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+  .numbersection_sample{
+    padding:0px 13px;
+    height: 135px;
+    /* overflow-y: scroll; */
+    overflow-x: hidden;
+    top: 35px;
+    position: absolute;
+  }
+  .number-button {  
+    flex: 1 1; 
+    height: 22.4px;
+    width: 45.5px;
+    padding: 3px 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    background-color: #f0f0f0;
+    cursor: pointer;
+    font-size: 10px;
+    transition: background-color 0.3s, color 0.3s;
+  }
+
+ 
+  .number-button-ref {
+    width: 37px;
+    height: 23px;
+    padding: 3px 10px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin: 5px 10px;
+    cursor: pointer;
+    font-size: 10px;
+  }
+  
+  .number-button.active {
+    background-color: #007bff !important;
+    color: #fff;
+  }
+  
+  .number-button.answered,  .number-button-ref.answered {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  .number-button:hover {
+    background-color: #e0e0e0;
+
+  }
+  
+ .answered.tagged,.taganswered{
+    background-color: purple  ;
+    color: white;
+  }
+  .tagged{
+    background-color: orange  ;
+    color: white;
+  }
+
+  .unattempt{
+    background-color: white;
+  }
+
+  .calc-div{
+    float: right;
+    /* position: absolute; */
+    /* top: 5px; */
+  }
+  .divcalc{
+    width: 100px;
+    background: red;
+    display: contents;
+  }
+  .titleCalc{
+    width: 100%;
+    height: auto;
+    padding: 10px;
+    margin-bottom: 5px;
+  }

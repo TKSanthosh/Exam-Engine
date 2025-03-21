@@ -1,0 +1,67 @@
+--------------------
+29/1/2025, 3:57:46 pm
+--------------------
+XML RESPONSE
+--------------------
+{
+  "data": {
+    "membership_no": "920009332",
+    "examTime": "11:00:00",
+    "examStatus": "A"
+  }
+}
+--------------------
+Updated Query
+--------------------
+UPDATE biometric_report_api SET seat_no = ?, date_updated = ? WHERE membership_no = ? AND batch_time = ?
+--------------------
+29/1/2025, 3:57:55 pm
+--------------------
+XML RESPONSE
+--------------------
+{
+  "data": {
+    "membership_no": "DRUN000011,DRUN000012",
+    "examTime": "11:00:00",
+    "examStatus": "A"
+  }
+}
+--------------------
+Member Not Exists - Seat Number Not Available / Users Not Available
+--------------------
+[
+  "DRUN000011",
+  "DRUN000012"
+]
+--------------------
+4/2/2025, 1:15:15 pm
+--------------------
+XML RESPONSE
+--------------------
+{
+  "data": {
+    "membership_no": "940066663",
+    "examTime": "11:00:00",
+    "examStatus": "A"
+  }
+}
+--------------------
+Updated Query
+--------------------
+UPDATE biometric_report_api SET seat_no = ?, date_updated = ? WHERE membership_no = ? AND batch_time = ?
+--------------------
+4/2/2025, 1:15:15 pm
+--------------------
+XML RESPONSE
+--------------------
+{
+  "data": {
+    "membership_no": "940066663",
+    "examTime": "11:00:00",
+    "examStatus": "A"
+  }
+}
+--------------------
+Updated Query
+--------------------
+UPDATE biometric_report_api SET seat_no = ?, date_updated = ? WHERE membership_no = ? AND batch_time = ?

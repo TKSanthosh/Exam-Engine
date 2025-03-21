@@ -1,0 +1,130 @@
+.calculator {
+    width: 350px;
+    background-color: white;
+    margin: auto;
+    padding: 30px 30px 20px 30px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+.rough-sheet{
+    width: 600px;
+    background-color: white;
+    padding: 20px 50px;
+    border-radius: 5px;
+}
+.cal-sub{
+    background-color: #006aff !important;
+}
+.cal-sub:hover{
+    background-color: #0551ba !important;
+    font-weight: 900;
+}
+.display {
+    position: relative;
+    width: 100%;
+    height: 50px;
+    margin-bottom: 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.display input {
+    width: 100%;
+    height: 30px;
+    text-align: right;
+    padding-right: 10px;
+    font-size: 18px;
+    border: none;
+    border-bottom: 1px solid #ccc;
+}
+
+.display .result {
+    text-align: right;
+    font-size: 20px;
+    padding: 5px 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    height: 40px;
+}
+
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 5px;
+}
+
+.buttons button {
+    padding: 15px;
+    font-size: 18px;
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.buttons button:hover {
+    background-color: #e1e1e1;
+}
+.modal {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}
+
+.modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.25);
+    position: relative;
+}
+.close-rough{
+    position: absolute;
+    top: 40px;
+    right: 350px;
+    font-size: 15px;
+    cursor: pointer;
+    background-color: red;
+    color: white;
+    height: 25px;
+    padding: 1px 0px 0px 5px;
+    width: 20px;
+    border-radius: 5px;
+}
+.close {
+    position: absolute;
+    top: -25px;
+    right: -25px;
+    font-size: 15px;
+    cursor: pointer;
+    background-color: red;
+    color: white;
+    height: 25px;
+    padding: 1px 0px 0px 5px;
+    width: 20px;
+    border-radius: 5px;
+}
+.close:hover{
+    background-color: rgb(209, 4, 4);
+    font-weight: 900;
+}
+.cal-btn{
+    cursor: pointer;
+    margin: 0px 5px;
+}
+
+.cal-btn:hover{
+    height: 17px !important;
+    width: 17px !important;
+    transition: width 0.2s ease-in-out, height 0.2s ease-in-out;
+}

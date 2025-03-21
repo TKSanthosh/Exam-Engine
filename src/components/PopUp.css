@@ -1,0 +1,102 @@
+.popupQP {
+  display: block; /* Visible by default */
+  position: fixed; 
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  background-color: rgb(0 0 0 / 60%); /* Black background with opacity */
+}
+
+/* .popup {
+  display: block;  
+  position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); Black background with opacity
+} */
+
+.popupQP-content {
+  position: relative;
+  background-color: white;
+  margin: 30vh auto;
+  padding: 90px;
+  font-size: 25px;
+  height: 250px;
+  width: 70%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  border-top: 13px solid #a7de35;
+}
+
+
+/* The popup div - visible by default */
+.popup {
+  display: block; /* Visible by default */
+  position: fixed; /* Stay in place */
+  z-index: 1; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; /* Full width */
+  height: 100%; /* Full height */
+  background-color: rgb(0 0 0 / 60%); /* Black background with opacity */
+}
+
+/* .popup { */
+  /* display: block; */
+   /* Visible by default */
+  /* position: fixed;
+  z-index: 1;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%; */
+  /* background-color: rgba(0, 0, 0, 0.5);  */
+  /* Black background with opacity */
+/* } */
+
+.popup-content {
+  position: relative;
+  background-color: white;
+  margin: 10% auto;
+  padding: 90px;
+  font-size: 15px;
+  height: 250px;
+  width: 70%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  border-radius: 10px;
+  border-top: 13px solid #a7de35;
+}
+
+.close-button {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.button-save-ips {
+  margin-bottom: 25px !important;
+  margin-left: 10px;
+  background-color: yellowgreen;
+  color: white;
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+}
+
+.alignLmarginB{
+  margin-bottom: 25px !important;
+  text-align: left;
+}

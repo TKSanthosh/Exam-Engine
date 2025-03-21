@@ -1,0 +1,4 @@
+/* styles.css */
+.dynamic-element {
+  color: var(--dynamic-color, #3498db); /* Set a default color */
+}

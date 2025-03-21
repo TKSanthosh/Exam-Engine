@@ -1,0 +1,51 @@
+/* .card-container {
+    position: relative;
+    width: 250px;
+    height: 150px;
+    right: 6.8%;
+}
+
+.switch-container {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.switch-input {
+    margin-left: 10px;
+} */
+
+
+
+/* .card {
+    position: absolute;
+    width: 250px;
+    height: 150px;
+    transition: transform 0.5s ease-in-out, opacity 0.5s ease-in-out;
+    opacity: 0;
+    transform: translateX(100%);
+} */
+
+/* .card-show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.card-hide {
+    opacity: 0;
+    transform: translateX(-100%);
+} */
+
+/* .loader {
+    border: 4px solid rgba(0,0,0,0.1);
+    border-radius: 50%;
+    border-top: 4px solid #3498db;
+    width: 36px;
+    height: 36px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+} */

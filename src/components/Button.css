@@ -1,0 +1,190 @@
+.arrow {
+    background-color: #405055;
+    width: auto;
+    color: white;
+    /* min-width: 1rem; */
+    padding: 0.625rem 1.5rem;
+    margin: 7px 5px ;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease; /* Smooth transition */
+    position: relative; /* Position relative for arrow */
+    overflow: hidden;
+  }
+  .btn-nxt::after {
+    content: '→'; /* Unicode arrow */
+    position: absolute;
+    opacity: 0;
+    right: -20px; /* Start hidden */
+    top: 50%;
+    transform: translateY(-50%);
+    transition: opacity 0.3s ease, right 0.3s ease;
+  }
+  
+  .btn-nxt:hover::after {
+    opacity: 1;
+    right: 10px; /* Move arrow into view */
+  }
+  .btn-prev::after {
+    content: '←'; /* Unicode arrow */
+    position: absolute;
+    opacity: 0;
+    left: -20px; /* Start hidden on the left */
+    top: 50%;
+    transform: translateY(-50%);
+    transition: opacity 0.3s ease, left 0.3s ease;
+  }
+  .disabled-btn{
+    color: white;
+    padding: 0.625rem 1.5rem;
+    margin: 6px 5px;
+    text-align: center;
+    width: auto;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 500;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s ease; /* Smooth transition */
+    position: relative; /* Position relative for arrow */
+    overflow: hidden;
+}
+
+  .btn-prev:hover::after {
+    opacity: 1;
+    left: 10px; /* Move arrow into view */
+  }
+  
+  .arrow:hover {
+    background-color: #88b20f; /* Change button color on hover */
+  }
+  
+  .tag-button {
+    background-color: #e0d504;
+    color: #333;
+    padding: 0.625rem 1.5rem;
+    margin: 6px;
+    width: auto ;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    cursor: pointer;
+    margin-left: 7vw;
+    font-size:  0.75rem;
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+
+  .tagEraseBtn{
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center; /* Centers horizontally */
+    align-items: center; /* Centers vertically */
+  /* gap: 10px; Adds space between buttons */
+  }
+  
+  .tag-button:hover {
+    background-color: #c2b908;
+  }
+
+ 
+  .erase-button {
+    background-color: #f44336; /* Red background */
+    color: white;
+    width: auto ;
+    padding: 0.625rem 1.5rem;
+    margin: 6px;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.3s ease;
+    display: inline-block;
+  }
+  
+  .erase-button:hover {
+    background-color: #d32f2f; /* Darker red on hover */
+  }
+  
+  @media screen and (max-width:67em) {
+    /* .footertab.row{
+      flex-wrap: nowrap;
+    } */
+    .tag-button{
+      margin-left: 5vw !important;
+    }
+    .erase-button::before{
+      content:"Erase";
+    }
+    .tag-button::before{
+      content:"Tag";
+    }
+    .previous-button-div::before{
+      content:"Prev"
+    }
+    .next-button-div::before{
+      content:"Next"
+    }
+    .btn-submit::before{
+      content:"Submit"
+    }
+    .btn-submit-disabled::before{
+      content:"Submit"
+    }
+    .de-tag::before{
+      content: "De-tag"
+    }
+    .erase-button span,
+    .tag-button span,
+    .previous-button-div span,
+    .next-button-div span,
+    .btn-submit span,
+    .btn-submit-disabled span
+    .de-tag span
+    {
+      display: none;
+    }
+  }
+  
+  .btn-submit{
+    right: 40px;
+    position: absolute;
+    color: black;
+    background: #88b20f;
+  }
+  .btn-submit-disabled, .btn-submit-disabled:hover{
+    right: 40px;
+    position: absolute;
+    color: black;
+    background: #cedeaf;
+  }
+  .btn-submit::after {
+    content: '✓';
+    position: absolute;
+    opacity: 0;
+    left: 0px !important;
+    top: 50%;
+    transform: translateY(-50%);
+    transition: opacity 0.3s ease, left 0.3s ease;
+    background-color: #587b13;
+    color: white;
+    padding: 6%;
+  }
+  .btn-submit:hover{
+    background-color: #90c723 !important;
+    font-size: 0.775rem;
+    /* margin-left: 10vw; */
+    
+  }
+  .btn-submit:hover::after {
+    opacity: 1;
+    left: 10px;
+     /* Move arrow into view */
+  }
