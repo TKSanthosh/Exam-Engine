@@ -134,6 +134,8 @@ const ExamForm = () => {
   const [count, setCount] = useState(0);
   const [openDialog, setOpenDialog] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [nextSection,setNextSection] = useState(0);
+  const [incompleteSections, setInCompleteSections] = useState([]);
 
   const navigate = useNavigate();
 

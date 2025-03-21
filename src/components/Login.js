@@ -75,6 +75,20 @@ const Login = ({ onLogin }) => {
     
         getIp();
       }, []);
+
+      const candidateInfos = sessionStorage.getItem("candidateInfo"); 
+      let parsedData = null; 
+      if (candidateInfos) {
+        try {
+          parsedData = JSON.parse(candidateInfos);
+        } catch (error) {
+          console.error(
+            "Error parsing candidateInfo from sessionStorage:",
+            error
+          );
+        }
+      }
+const {display_sec_timer} = parsedData;
   const handleLogin = async () => {
     try {
       const response = await fetch('http://localhost:5000/login', {
@@ -86,7 +100,8 @@ const Login = ({ onLogin }) => {
           username: username,
           password: btoa(password),
           centre_code: tausername.replace('iwfr_', '').toUpperCase(),
-          HostIp: HostIp
+          HostIp: HostIp,
+          display_sec_timer,
         }),
       });
       if (response.ok) {

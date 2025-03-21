@@ -5053,16 +5053,14 @@ function trackCandidateLogin(
   examCode,
   subjCode,
   browser,
+  display_sec_timer,
   callback
 ) {
   const checkQuery = `
     SELECT * FROM iib_candidate_tracking 
     WHERE ta_login = ? AND membership_no = ? AND exam_code = ? AND subject_code = ?`;
 
-  db.query(
-    checkQuery,
-    [taLogin, membershipNo, examCode, subjCode],
-    (err, results) => {
+  db.query(checkQuery,[taLogin, membershipNo, examCode, subjCode],(err, results) => {
       if (err) return callback(err);
 
       if (results.length > 0) {
@@ -5083,26 +5081,18 @@ function trackCandidateLogin(
         );
       } else {
         // Insert new record
-        const insertQuery = `
-        INSERT INTO iib_candidate_tracking 
+        const insertQuery = `INSERT INTO iib_candidate_tracking 
         (ta_login, membership_no, cafe_id, host_ip, session_id, browser_details, exam_code, subject_code) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
 
-        db.query(
-          insertQuery,
-          [
-            taLogin,
-            membershipNo,
-            cafeID,
-            hostIP,
-            sessionID,
-            browser,
-            examCode,
-            subjCode,
-          ],
-          (insertErr) => {
+        db.query(insertQuery,[taLogin,membershipNo,cafeID,hostIP,sessionID,browser,examCode,subjCode,],(insertErr) => {
             if (insertErr) return callback(insertErr);
+            
             console.log("Candidate login tracked successfully.");
+          if(display_sec_timer == 'Y'){
+            
+          }
+
             callback(null); // Success
           }
         );
@@ -5112,7 +5102,8 @@ function trackCandidateLogin(
 }
 
 app.post("/login", async (req, res) => {
-  const { username, password, centre_code, HostIp } = req.body;
+  const { username, password, centre_code, HostIp,display_sec_timer } = req.body;
+  console.log(req.body)
   const hostIP = HostIp;
 
   try {
@@ -5164,16 +5155,7 @@ app.post("/login", async (req, res) => {
       const ta_login = await getTALoginByHostIP(hostIP);
       const browser = getUserAgent(req);
 
-      trackCandidateLogin(
-        username,
-        ta_login,
-        hostIP,
-        hostIP,
-        1,
-        exam_code,
-        subject_code,
-        browser,
-        (trackErr) => {
+      trackCandidateLogin(username,ta_login,hostIP,hostIP,1,exam_code,subject_code,browser,display_sec_timer,(trackErr) => {
           if (trackErr)
             return handleError(
               res,
@@ -15562,6 +15544,35 @@ app.post("/check-approval-status", async (req, res) => {
   }
 });
 
+app.get("/getSectionCompInCompDetails",async(req,res)=>{
+  const {examCode,subjectCode,membershipNo} = req.params;
+
+  const getSectionIncomplete=async(examCode,subjectCode,membershipNo)=>{
+    const query = "SELECT section_code FROM iib_section_test WHERE subject_code = ? AND exam_code = ? AND membership_no = ? and test_status=?";
+    return new Promise((resolve,reject)=>{
+      db.query(query,[subjectCode,examCode,membershipNo,'IC'],(err,results)=>{
+        if(err){
+          console.error("Error executing query:", err);
+          return reject({ success: false, message: "Database error", err });
+        }
+        return resolve(results[0])
+    })
+    })
+}
+
+const getSectionComplete = async(examCode,subjectCode,membershipNo)=>{
+  const query = "SELECT section_code FROM iib_section_test WHERE subject_code = ? AND exam_code = ? AND membership_no = ? and test_status=?";
+  return new Promise((resolve,reject)=>{
+    db.query(query,[subjectCode,examCode,membershipNo,'C'],(err,results)=>{
+      if(err){
+        console.error("Error executing query:", err);
+        return reject({ success: false, message: "Database error", err });
+      }
+      return resolve(results[0]);
+    })
+  })
+}
+})
 process.on("uncaughtException", (err) => {
   console.error("Uncaught Exception:", err);
 });
