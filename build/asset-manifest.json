@@ -1,0 +1,28 @@
+{
+  "files": {
+    "main.css": "/build/static/css/main.9072c0a8.css",
+    "main.js": "/build/static/js/main.86f3c2d0.js",
+    "static/js/453.f3f8e7d1.chunk.js": "/build/static/js/453.f3f8e7d1.chunk.js",
+    "static/media/broken.gif": "/build/static/media/broken.0c445fb26a22e08adaab.gif",
+    "static/media/refresh.gif": "/build/static/media/refresh.e2aa4c0d6dca6e4713f5.gif",
+    "static/media/sify-logo.png": "/build/static/media/sify-logo.3e97c29ea0c12940a6c5.png",
+    "static/media/sify.png": "/build/static/media/sify.0604a019e4a49a497466.png",
+    "static/media/shutdown.png": "/build/static/media/shutdown.dbeff209467a9972aea6.png",
+    "static/media/restart.png": "/build/static/media/restart.d5b32698ce495ddc3aef.png",
+    "static/media/synchronize.png": "/build/static/media/synchronize.7268c0fcc9a778e1e3b3.png",
+    "static/media/int-down.png": "/build/static/media/int-down.05c6789feadbadba7e98.png",
+    "static/media/scientific-calculator.png": "/build/static/media/scientific-calculator.8157602261ef7cc9092a.png",
+    "static/media/calculator.png": "/build/static/media/calculator.2edaefce94b0aa5a093f.png",
+    "static/media/wifi.png": "/build/static/media/wifi.6cc631618343122b085c.png",
+    "static/media/pencil.png": "/build/static/media/pencil.acdbed0dfdbed724cd18.png",
+    "static/media/theme.png": "/build/static/media/theme.eb6c3ea75a8b0cb8dac9.png",
+    "index.html": "/build/index.html",
+    "main.9072c0a8.css.map": "/build/static/css/main.9072c0a8.css.map",
+    "main.86f3c2d0.js.map": "/build/static/js/main.86f3c2d0.js.map",
+    "453.f3f8e7d1.chunk.js.map": "/build/static/js/453.f3f8e7d1.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.9072c0a8.css",
+    "static/js/main.86f3c2d0.js"
+  ]
+}

@@ -604,7 +604,7 @@ const ExamForm = () => {
       <table className="options-table">
         <tbody>
           {reorderedOptions.map((option, index) => {
-            if (!option || !option.text) {
+            if (!option || !option.text || typeof(option.text) == "object") {
               // console.warn(
               //   `Option or text is missing at index ${index}`,
               //   option
@@ -1105,7 +1105,7 @@ const ExamForm = () => {
     const currentQP =
       filteredQuestions.length > 0
         ? currentQuestionIndex
-        : currentQuestionIndex + 1;
+        : currentQuestionIndex+1;
     setEnableTag(0);
 
     setTagQuestions((prevTagQuestions) => {
@@ -1575,10 +1575,7 @@ const ExamForm = () => {
                       }`}
                       onClick={handleBackQuestion}
                       disabled={
-                        filteredQuestions.length > 0
-                          ? currentQuestionIndex ==
-                            filteredQuestions[0].display_order
-                          : currentQuestionIndex == 0
+                        filteredQuestions.length > 0 ? currentQuestionIndex == filteredQuestions[0].display_order : currentQuestionIndex == 0
                         // currentQuestionIndex == 0
                       }
                     >
