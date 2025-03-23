@@ -4814,8 +4814,7 @@ app.get("/get-clienttime/:question_paper_no", (req, res) => {
       return res.status(500).send("Server error");
     }
 
-    const time_extended =
-      timeResult.length > 0 ? Number(timeResult[0].time_extended) : 0;
+    const time_extended = timeResult.length > 0 ? Number(timeResult[0].time_extended) : 0;
     // console.log("time_extended", time_extended);
 
     // Next, fetch clienttime from iib_response
@@ -15560,18 +15559,21 @@ app.get("/getSectionCompInCompDetails",async(req,res)=>{
     })
 }
 
-const getSectionComplete = async(examCode,subjectCode,membershipNo)=>{
-  const query = "SELECT section_code FROM iib_section_test WHERE subject_code = ? AND exam_code = ? AND membership_no = ? and test_status=?";
-  return new Promise((resolve,reject)=>{
-    db.query(query,[subjectCode,examCode,membershipNo,'C'],(err,results)=>{
-      if(err){
-        console.error("Error executing query:", err);
-        return reject({ success: false, message: "Database error", err });
-      }
-      return resolve(results[0]);
+  const getSectionComplete = async(examCode,subjectCode,membershipNo)=>{
+    const query = "SELECT section_code FROM iib_section_test WHERE subject_code = ? AND exam_code = ? AND membership_no = ? and test_status=?";
+    return new Promise((resolve,reject)=>{
+      db.query(query,[subjectCode,examCode,membershipNo,'C'],(err,results)=>{
+        if(err){
+          console.error("Error executing query:", err);
+          return reject({ success: false, message: "Database error", err });
+        }
+        return resolve(results[0]);
+      })
     })
-  })
-}
+  }
+
+
+
 })
 process.on("uncaughtException", (err) => {
   console.error("Uncaught Exception:", err);
