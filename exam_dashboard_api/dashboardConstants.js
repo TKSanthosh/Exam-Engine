@@ -1,0 +1,5 @@
+const DASHBOARD_CONFIG = {
+  "EXAM_DASHBOARD_ACCESS_TOKEN": "",
+};
+
+module.exports = { DASHBOARD_CONFIG };

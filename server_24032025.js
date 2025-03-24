@@ -609,6 +609,8 @@ app.post("/clientlogin", async (req, res) => {
 
     DASHBOARD_CONFIG.EXAM_DASHBOARD_ACCESS_TOKEN = loginResponse.data.at;
 
+    // console.log(DASHBOARD_CONFIG.EXAM_DASHBOARD_ACCESS_TOKEN);
+
     const expiryTime = moment().tz("Asia/Kolkata").add(1, 'minutes');
     const dbExpiryTime = expiryTime.format("YYYY-MM-DD HH:mm:ss");
     const refreshTokens = loginResponse.data.rt;
@@ -651,11 +653,17 @@ app.post("/clientlogin", async (req, res) => {
 
     console.log(data_eal);
 
-    
+    const cookies_rt = req.cookies.rt;
 
     const response = await axiosPrivate.post(
       `${process.env.EXAM_DASHBOARD_URL}/autoAssignServerNumber`,
-      data_eal
+      data_eal,
+      {
+        headers: {
+            Cookie: `$rt=${cookies_rt}`,
+            "Content-Type": "application/json"
+        },
+      }
     );
     console.log(data_eal)
     const res_eal = response.data.data.split("^$^");
@@ -711,10 +719,16 @@ app.post("/clientlogin", async (req, res) => {
         CHECKSUM: process.env.CHECKSUMKEY,
         pass: password,
       };
-      
+      const cookies_rt = req.cookies.rt;
       const responseServerReady = await axiosPrivate.post(
         `${process.env.EXAM_DASHBOARD_URL}/biometricCountUpdateApi`,
-        dataServerReady
+        dataServerReady,
+        {
+          headers: {
+              Cookie: `$rt=${cookies_rt}`,
+              "Content-Type": "application/json"
+          },
+        }
       );
 
       const responseServerReadyVal =
@@ -827,10 +841,17 @@ app.post("/Qpactivation", async (req, res) => {
   };
 
   console.log(data_eal);
-  
-  const response = await axiosPrivate.post(
+
+  const response = await axios.post(
     `${process.env.EXAM_DASHBOARD_URL}/autoAssignServerNumber`,
-    data_eal
+    data_eal,
+    {
+      headers: {
+        Authorization: `Bearer ${apiToken}`,
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,
+    }
   );
 
   const res_eal = response.data.data.split("^$^");
@@ -942,16 +963,14 @@ app.post("/Qpactivation", async (req, res) => {
       //     responseType: "arraybuffer",
       //     httpsAgent: new https.Agent({ rejectUnauthorized: false }),
       //   })
-      // console.log(
-      //   "=================================================================="
-      // );
-      // console.log(impfile[0]);
-      // console.log(
-      //   "=================================================================="
-      // );
-      
-      
-      await axiosPrivate
+      console.log(
+        "=================================================================="
+      );
+      console.log(impfile[0]);
+      console.log(
+        "=================================================================="
+      );
+      await axios
         .post(
           `${process.env.EXAM_DASHBOARD_URL}/getServerFiles`,
           { pathcmd: Buffer.from(impfile[0]).toString("base64") }, // pathcmd is the nas path for activation file path
@@ -1054,6 +1073,7 @@ app.post("/Qpactivation", async (req, res) => {
   //     });
   //   });
 });
+
 // Demo Working code
 // app.post("/Qpactivation", async (req, res) => {
 //   const { serialNumber, batch, batchval, password } = req.body;
@@ -1535,354 +1555,17 @@ app.post("/upload", upload.single("file"), (req, res) => {
 
 // Live Working code
 app.post("/activate/:status/:batch/:serialNumber/:qpStatus",async (req, res) => {
-    const { status, batch, serialNumber, qpStatus } = req.params;
-    const controller = new AbortController();
-    if (status == "Act") {
-      // Send the response after both operations are successful
-      return res.send(
-        "Dump file imported and PM2 process restarted successfully"
-      );
-    }
+  const { status, batch, serialNumber, qpStatus } = req.params;
+  const controller = new AbortController();
+  if (status == "Act") {
+    // Send the response after both operations are successful
+    return res.status(200).json({"message":
+      "Dump file imported and PM2 process restarted successfully"}
+    );
+  }
 
-    if (status == "Base" && qpStatus == 1) {
-      try{
-        const data_eal = {
-          process: "1",
-          macId: serialNumber,
-          database: process.env.DB_NAME,
-          action: "",
-          serverNumber: "",
-        };
-  
-        console.log(data_eal);
-        const response = await axiosPrivate.post(
-          `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
-          data_eal
-        );
-        console.log(response.message);
-        const res_eal = response.data.data.split("^$^");
-        const responseCurl = res_eal[0];
-        const autoID = res_eal[1];
-        const pre = res_eal[2];
-        const pos = res_eal[3];
-        const dPath = res_eal[4];
-        const servernoVal = res_eal[5];
-        const ccode = res_eal[6];
-  
-        const data_ealOne = {
-          process: "1",
-          macId: serialNumber,
-          database: process.env.DB_NAME,
-          action: "",
-          serverNumber: servernoVal,
-          centreCode: ccode,
-        };
-  
-        // console.log(data_ealOne);
-        const responseOne = await axiosPrivate.post(
-          `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
-          data_ealOne
-        );
-  
-        const res_ealOne = responseOne.data.data.split("^$^");
-        const responseCurlOne = res_ealOne[0];
-        const autoIDOne = res_ealOne[1];
-        const preOne = res_ealOne[2];
-        const posOne = res_ealOne[3];
-        const dPathOne = res_ealOne[4];
-        const servernoValOne = res_ealOne[5];
-        const ccodeOne = res_ealOne[6];
-  
-        console.log("ONE", res_ealOne);
-        if (responseCurlOne == "S") {
-          const data_ealTwo = {
-            process: "1",
-            macId: serialNumber,
-            database: process.env.DB_NAME,
-            action: "OI",
-            serverNumber: servernoVal,
-            centreCode: ccode,
-          };
-  
-          console.log("Two", data_ealTwo);
-          
-          const responseTwo = await axiosPrivate.post(
-            `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
-            data_ealTwo
-          );
-  
-          const res_ealTwo = responseTwo.data.data.split("^$^");
-          const responseCurlTwo = res_ealTwo[0];
-          const autoIDTwo = res_ealTwo[1];
-          const preTwo = res_ealTwo[2];
-          const posTwo = res_ealTwo[3];
-          const dPathTwo = res_ealTwo[4];
-          const servernoValTwo = res_ealTwo[5];
-          const ccodeTwo = res_ealTwo[6];
-  
-          console.log(res_ealTwo);
-        }
-  
-        if (status == "Base") {
-          if (responseCurlOne == "A") {
-            // const qpfile = `${process.env.DEMOSERVER}${Buffer.from(dPathOne, "base64").toString()}/${process.env.DB_NAME}.zip`;
-            const downQPpath1 = `${process.env.DOWNQPPATH}\\${process.env.DB_NAME}.zip`;
-            const sqlDB = process.env.DB_NAME;
-            const filename = Buffer.from(
-              `${Buffer.from(dPathOne, "base64").toString()}/${sqlDB}.zip||${process.env.DB_NAME}`
-            ).toString("base64");
-  
-            // const downQPpath1 = path.join("C:/pro/itest/activate", `${process.env.DB_NAME}.zip`);
-            const extractPath = process.env.DOWNQPPATH; // Extract directly here
-  
-            // let dumpFilePath = downQPpath1;
-            try {
-              
-              const response = await axiosPrivate.post(
-                `${process.env.EXAM_DASHBOARD_URL}/getServerFiles`,
-                { pathcmd: filename },
-                {
-                  responseType: "stream", // ✅ Use "stream" to track progress properly
-                  httpsAgent: new https.Agent({ rejectUnauthorized: false }), // ⚠️ Only use in dev if SSL issues exist
-                  signal: controller.signal,
-                }
-              );
-  
-              if (response.status !== 200) {
-                console.error(
-                  `Failed to download file. HTTP Status: ${response.status}`
-                );
-                return res
-                  .status(response.status)
-                  .json({
-                    success: "false",
-                    message: "Failed to download the file.",
-                  });
-              }
-              const totalSize = response.headers["content-length"] || 0;
-              let downloadedSize = 0;
-              let lastChunkTime = Date.now();
-              console.log("starting the download")
-              const writer = fs.createWriteStream(downQPpath1);
-  
-              response.data.on("data", (chunk) => {
-                downloadedSize += chunk.length;
-                lastChunkTime = Date.now();
-                const downloadPercentage = ((downloadedSize / totalSize) *100).toFixed(2);
-                // io.emit("download-percentage", {percentage: downloadPercentage,});
-                console.log(`Downloaded: ${downloadedSize} / ${totalSize} bytes`);
-              });
-  
-              const downloadInterval = setInterval(() => {
-                if (Date.now() - lastChunkTime > 60000) {
-                  console.warn("Download stalled, aborting...");
-                  controller.abort();
-                  // if (!responseSent) {
-                  //   responseSent = true;
-                  clearInterval(downloadInterval);
-                  return res.status(500).send({
-                    success: "false",
-                    message: "Download failed due to inactivity.",
-                  });
-                  // }
-                }
-              }, 100);
-  
-              response.data.pipe(writer); // ✅ Stream file to disk instead of `writeFileSync`
-  
-              // Save the ZIP file locally
-              await new Promise((resolve, reject) => {
-                writer.on("finish", async () => {
-                  clearInterval(downloadInterval);
-                  if (totalSize && downloadedSize.toString() !== totalSize) {
-                    console.error("File might be incomplete!");
-                    await fs.promises.unlink(downQPpath1);
-                    return reject(new Error("Incomplete file download"));
-                  }
-  
-                  console.log("Download complete!");
-                  return resolve();
-                });
-  
-                writer.on("error", async (err) => {
-                  clearInterval(downloadInterval);
-                  await fs.promises.unlink(downQPpath1);
-                  return reject(err);
-                });
-              });
-  
-              console.log(`File downloaded and saved to: ${downQPpath1}`);
-  
-              // Extract ZIP file directly to the required folder
-              const zip = new AdmZip(downQPpath1);
-              zip.extractAllTo(extractPath, true);
-              console.log(`Files extracted to: ${extractPath}`);
-  
-              // Delete ZIP after extraction
-              await fs.promises.unlink(downQPpath1);
-              console.log("ZIP file deleted after extraction.");
-            } catch (err) {
-              console.log(err);
-              return res
-                .status(500)
-                .json({"message":"Error during zip extraction", error: err.message || "Internal Server Error" });
-            }
-            // Fetch the file from URL
-            const mysqlPath = process.env.MYSQLPATH;
-  
-            // Escape special characters in password
-            const escapedPassword = process.env.DB_PASSWORD.replace(/"/g, '\\"');
-  
-            const dumpFilePath = path.join(extractPath, `${sqlDB}.sql`);
-  
-            console.log(dumpFilePath);
-            // Construct the MySQL import command
-            const command = `"${mysqlPath}" -u ${process.env.DB_USER} --password="${escapedPassword}" ${process.env.DB_NAME} < "${dumpFilePath}"`;
-            // console.log("Executing command:", command);
-  
-            try {
-              // Execute the MySQL import command
-              const { stdout, stderr } = await execAsync(command);
-              if (stderr) {
-                console.error(`MySQL stderr: ${stderr}`);
-              }
-  
-              if (stdout) {
-                console.log(`MySQL stdout: ${stdout}`);
-              } else {
-                console.log("MySQL executed successfully with no output.");
-              }
-              // let autoID= "1";
-              let autoID = autoIDOne;
-              // if (autoID !== "" && mockDB === "") {
-              if (autoID !== "") {
-                const queries = [
-                  `ALTER TABLE iib_candidate_test AUTO_INCREMENT = ${autoID}`,
-                  `ALTER TABLE iib_candidate_scores AUTO_INCREMENT = ${autoID}`,
-                ];
-  
-                queries.forEach((query) => {
-                  db.query(query, (err, result) => {
-                    if (err) {
-                      console.error("Error updating AUTO_INCREMENT:", err);
-                    } else {
-                      console.log(
-                        "AUTO_INCREMENT updated successfully for:",
-                        query
-                      );
-                    }
-                  });
-                });
-              }
-  
-              // Insert into autofeed
-              const insertAutofeedSQL =
-                "INSERT INTO autofeed (center_code, serverno, autoid) VALUES (?, ?, ?)";
-              const formattedinsertAutofeedSQL = db.format(insertAutofeedSQL, [
-                ccode,
-                servernoVal,
-                1,
-              ]);
-              db.query(
-                insertAutofeedSQL,
-                [ccode, servernoVal, 1],
-                async (err) => {
-                  if (err) {
-                    console.error("MySQL insert error:", err);
-                    return res
-                      .status(500)
-                      .json({ message: "Error inserting data into autofeed." });
-                  }
-  
-                  // Insert the exact formatted query into xml_feed
-                  //  insertIntoXmlFeed(formattedinsertAutofeedSQL, (err) => {
-                  //    if (err) {
-                  //      return db.rollback(() => {
-                  //        console.error("Error inserting feed table:", err);
-                  //        res.status(500).json({ message: "Internal Server Error" });
-                  //      });
-                  //    }
-                  //  });
-                }
-              );
-  
-              // const sqlInsert = `INSERT INTO qp_download (centre_code, serverno, download_sec, download_status, download_time) VALUES (?, ?, ?, ?, ?)`;
-              const sqlUpdate = `UPDATE qp_download SET serverno = ? , download_status = ? , download_time = ? WHERE centre_code = ? AND download_sec = ? `;
-              // const sqlUpdate = `UPDATE qp_download SET serverno = ? , download_status = ? WHERE centre_code = ?`;
-              const UpdateVal = [
-                servernoValOne,
-                "D",
-                formattedTime,
-                ccodeOne,
-                "Mac Address",
-              ];
-              const formattedsqlUpdate = db.format(sqlUpdate, UpdateVal);
-              db.query(sqlUpdate, UpdateVal, (err) => {
-                if (err) {
-                  console.error("MySQL insert error:", err);
-                  return res
-                    .status(500)
-                    .json({ message: "Internal Server Error" });
-                }
-  
-                // Insert the exact formatted query into xml_feed
-                // insertIntoXmlFeed(formattedsqlUpdate, (err) => {
-                //   if (err) {
-                //     return db.rollback(() => {
-                //       console.error("Error inserting feed table:", err);
-                //       res.status(500).json({ message: "Internal Server Error" });
-                //     });
-                //   }
-                // });
-              });
-  
-              const sqlInsertBase = `INSERT INTO qp_download (centre_code, serverno, download_sec, download_status, download_time) VALUES (?, ?, ?, ?, ?)`;
-              const formattedsqlInsertBase = db.format(sqlInsertBase, [
-                ccodeOne,
-                servernoValOne,
-                "Base QP",
-                "D",
-                formattedTime,
-              ]);
-              db.query(
-                sqlInsertBase,
-                [ccodeOne, servernoValOne, "Base QP", "D", formattedTime],
-                (err) => {
-                  if (err) {
-                    console.error("MySQL insert error:", err);
-                    return res
-                      .status(500)
-                      .json({ message: "Internal Server Error" });
-                  }
-  
-                  // Insert the exact formatted query into xml_feed
-                  // insertIntoXmlFeed(formattedsqlInsertBase, (err) => {
-                  //   if (err) {
-                  //     return db.rollback(() => {
-                  //       console.error("Error inserting feed table:", err);
-                  //       res.status(500).json({ message: "Internal Server Error" });
-                  //     });
-                  //   }
-                  // });
-                }
-              );
-              // Send the response after both operations are successful
-              return res.status(200).json({message:"Dump file imported and PM2 process restarted successfully"});
-            } catch (error) {
-              console.error("Error during process:", error);
-              return res.status(500).json("Error importing dump file or restarting PM2");
-            }
-          }
-        }
-      }catch(error){
-        console.error("Error during process:", error.message);
-        return res.status(500).json({"message":"Error during base download"});
-      }
-      
-    }
-
-    if (status != "Base" && status != "Act" && qpStatus == 2) {
-      // console.log("statusstatusstatus",status);
+  if (status == "Base" && qpStatus == 1) {
+    try{
       const data_eal = {
         process: "1",
         macId: serialNumber,
@@ -1892,188 +1575,307 @@ app.post("/activate/:status/:batch/:serialNumber/:qpStatus",async (req, res) => 
       };
 
       console.log(data_eal);
-      try{
-        const response = await axiosPrivate.post(
-          `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
-          data_eal
-        );
-  
-        const res_eal = response.data.data.split("^$^");
-        const responseCurl = res_eal[0];
-        const autoID = res_eal[1];
-        const pre = res_eal[2];
-        const pos = res_eal[3];
-        const dPath = res_eal[4];
-        const servernoVal = res_eal[5];
-        const ccode = res_eal[6];
-  
-        const data_ealOne = {
-          process: "2",
+      const response = await axios.post(
+        `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
+        data_eal
+        // {headers:
+        //   { Authorization: `Bearer ${apiToken}`,"Content-Type": "application/json",},
+        //       withCredentials: true,}
+      );
+      console.log(response.message);
+      const res_eal = response.data.data.split("^$^");
+      const responseCurl = res_eal[0];
+      const autoID = res_eal[1];
+      const pre = res_eal[2];
+      const pos = res_eal[3];
+      const dPath = res_eal[4];
+      const servernoVal = res_eal[5];
+      const ccode = res_eal[6];
+
+      const data_ealOne = {
+        process: "1",
+        macId: serialNumber,
+        database: process.env.DB_NAME,
+        action: "",
+        serverNumber: servernoVal,
+        centreCode: ccode,
+      };
+
+      // console.log(data_ealOne);
+
+      const responseOne = await axios.post(
+        `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
+        data_ealOne
+        // {headers:
+        //   { Authorization: `Bearer ${apiToken}`,"Content-Type": "application/json",},
+        //       withCredentials: true,}
+      );
+
+      const res_ealOne = responseOne.data.data.split("^$^");
+      const responseCurlOne = res_ealOne[0];
+      const autoIDOne = res_ealOne[1];
+      const preOne = res_ealOne[2];
+      const posOne = res_ealOne[3];
+      const dPathOne = res_ealOne[4];
+      const servernoValOne = res_ealOne[5];
+      const ccodeOne = res_ealOne[6];
+
+      console.log("ONE", res_ealOne);
+      if (responseCurlOne == "S") {
+        const data_ealTwo = {
+          process: "1",
           macId: serialNumber,
           database: process.env.DB_NAME,
-          action: "",
+          action: "OI",
           serverNumber: servernoVal,
           centreCode: ccode,
         };
-  
-        // console.log(data_ealOne);
-        const responseOne = await axiosPrivate.post(
+
+        console.log("Two", data_ealTwo);
+
+        const responseTwo = await axios.post(
           `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
-          data_ealOne
+          data_ealTwo
+          // {headers:
+          //   { Authorization: `Bearer ${apiToken}`,"Content-Type": "application/json",},
+          //       withCredentials: true,}
         );
-  
-        const res_ealOne = responseOne.data.data.split("^$^");
-        const responseCurlOne = res_ealOne[0];
-        const autoIDOne = res_ealOne[1];
-        const preOne = res_ealOne[2];
-        const posOne = res_ealOne[3];
-        const dPathOne = res_ealOne[4];
-        const servernoValOne = res_ealOne[5];
-        const ccodeOne = res_ealOne[6];
-  
-        console.log("ONE", res_ealOne);
-  
+
+        const res_ealTwo = responseTwo.data.data.split("^$^");
+        const responseCurlTwo = res_ealTwo[0];
+        const autoIDTwo = res_ealTwo[1];
+        const preTwo = res_ealTwo[2];
+        const posTwo = res_ealTwo[3];
+        const dPathTwo = res_ealTwo[4];
+        const servernoValTwo = res_ealTwo[5];
+        const ccodeTwo = res_ealTwo[6];
+
+        console.log(res_ealTwo);
+      }
+
+      if (status == "Base") {
         if (responseCurlOne == "A") {
-          const qpfile = `${process.env.DEMOSERVER}${Buffer.from(dPathOne, "base64").toString()}/${status}.zip`;
-          const downQPpath1 = `${process.env.DOWNQPPATH}\\${status}.zip`;
-          const sqlDB = status; // centre code = status
+          // const qpfile = `${process.env.DEMOSERVER}${Buffer.from(dPathOne, "base64").toString()}/${process.env.DB_NAME}.zip`;
+          const downQPpath1 = `${process.env.DOWNQPPATH}\\${process.env.DB_NAME}.zip`;
+          const sqlDB = process.env.DB_NAME;
           const filename = Buffer.from(
-            `${Buffer.from(dPathOne, "base64").toString()}/${sqlDB}.zip||${status}`
+            `${Buffer.from(dPathOne, "base64").toString()}/${sqlDB}.zip||${process.env.DB_NAME}`
           ).toString("base64");
-  
+
           // const downQPpath1 = path.join("C:/pro/itest/activate", `${process.env.DB_NAME}.zip`);
           const extractPath = process.env.DOWNQPPATH; // Extract directly here
-  
+
           // let dumpFilePath = downQPpath1;
-          
-          const response = await axiosPrivate.post(
-            `${process.env.EXAM_DASHBOARD_URL}/getServerFiles`,
-            { pathcmd: filename },
-            {
-              responseType: "stream", // ✅ Use "stream" to track progress properly
-              httpsAgent: new https.Agent({ rejectUnauthorized: false }), // ⚠️ Only use in dev if SSL issues exist
-              signal: controller.signal,
-            }
-          );
-  
-          if (response.status !== 200) {
-            console.error(
-              `Failed to download file. HTTP Status: ${response.status}`
-            );
-            return res.status(500).json({
-              success: "false",
-              message: "Failed to download the file.",
-            });
-          }
-          const totalSize = response.headers["content-length"];
-          let downloadedSize = 0;
-          let lastChunkTime = Date.now();
-  
-          const writer = fs.createWriteStream(downQPpath1);
-  
-          response.data.on("data", (chunk) => {
-            downloadedSize += chunk.length;
-            lastChunkTime = Date.now();
-            const downloadPercentage = (
-              (downloadedSize / totalSize) *
-              100
-            ).toFixed(2);
-            // io.emit("download-percentage", { percentage: downloadPercentage });
-            console.log(`Downloaded: ${downloadedSize} / ${totalSize} bytes`);
-          });
-  
-          const downloadInterval = setInterval(() => {
-            if (Date.now() - lastChunkTime > 60000) {
-              console.warn("Download stalled, aborting...");
-              controller.abort();
-              // if (!responseSent) {
-              //   responseSent = true;
-              clearInterval(downloadInterval);
-              return res.status(500).json({
-                success: "false",
-                message: "Download failed due to inactivity.",
-              });
-              // }
-            }
-          }, 100);
-  
-          response.data.pipe(writer); // ✅ Stream file to disk instead of `writeFileSync`
-  
-          // Save the ZIP file locally
-          await new Promise((resolve, reject) => {
-            writer.on("finish", () => {
-              clearInterval(downloadInterval);
-              if (totalSize && downloadedSize.toString() !== totalSize) {
-                console.error("File might be incomplete!");
-                fs.unlinkSync(downQPpath1);
-                return reject(new Error("Incomplete file download"));
+          try {
+            const response = await axios.post(
+              `${process.env.EXAM_DASHBOARD_URL}/getServerFiles`,
+              { pathcmd: filename },
+              {
+                responseType: "stream", // ✅ Use "stream" to track progress properly
+                httpsAgent: new https.Agent({ rejectUnauthorized: false }), // ⚠️ Only use in dev if SSL issues exist
+                signal: controller.signal,
               }
-  
-              console.log("Download complete!");
-              return resolve();
+            );
+
+            if (response.status !== 200) {
+              console.error(
+                `Failed to download file. HTTP Status: ${response.status}`
+              );
+              return res
+                .status(response.status)
+                .json({
+                  success: "false",
+                  message: "Failed to download the file.",
+                });
+            }
+            const totalSize = response.headers["content-length"] || 0;
+            let downloadedSize = 0;
+            let lastChunkTime = Date.now();
+            console.log("starting the download")
+            const writer = fs.createWriteStream(downQPpath1);
+
+            response.data.on("data", (chunk) => {
+              downloadedSize += chunk.length;
+              lastChunkTime = Date.now();
+              const downloadPercentage = ((downloadedSize / totalSize) *100).toFixed(2);
+              // io.emit("download-base", {percentage: downloadPercentage,});
+              console.log(`Downloaded: ${downloadedSize} / ${totalSize} bytes`);
             });
-  
-            writer.on("error", (err) => {
-              clearInterval(downloadInterval);
-              fs.unlinkSync(downQPpath1);
-              return reject(err);
+
+            const downloadInterval = setInterval(() => {
+              if (Date.now() - lastChunkTime > 60000) {
+                console.warn("Download stalled, aborting...");
+                controller.abort();
+                // if (!responseSent) {
+                //   responseSent = true;
+                clearInterval(downloadInterval);
+                return res.status(500).send({
+                  success: "false",
+                  message: "Download failed due to inactivity.",
+                });
+                // }
+              }
+            }, 100);
+
+            response.data.pipe(writer); // ✅ Stream file to disk instead of `writeFileSync`
+
+            // Save the ZIP file locally
+            await new Promise((resolve, reject) => {
+              writer.on("finish", async () => {
+                clearInterval(downloadInterval);
+                if (totalSize && downloadedSize.toString() !== totalSize) {
+                  console.error("File might be incomplete!");
+                  await fs.promises.unlink(downQPpath1);
+                  return reject(new Error("Incomplete file download"));
+                }
+
+                console.log("Download complete!");
+                return resolve();
+              });
+
+              writer.on("error", async (err) => {
+                clearInterval(downloadInterval);
+                await fs.promises.unlink(downQPpath1);
+                return reject(err);
+              });
             });
-          });
-  
-          console.log(`File downloaded and saved to: ${downQPpath1}`);
-  
-          // Extract ZIP file directly to the required folder
-          const zip = new AdmZip(downQPpath1);
-          zip.extractAllTo(extractPath, true);
-          console.log(`Files extracted to: ${extractPath}`);
-  
-          const qp_output = path.join(extractPath, `${status}.sql`);
-          let sqlContent = fs.readFileSync(qp_output, "utf8");
-          sqlContent = sqlContent.replace(/_temp/g, "");
-          fs.writeFileSync(qp_output, sqlContent, "utf8");
-  
-          // Delete ZIP after extraction
-          fs.unlinkSync(downQPpath1);
-          console.log("ZIP file deleted after extraction.");
-  
+
+            console.log(`File downloaded and saved to: ${downQPpath1}`);
+
+            // Extract ZIP file directly to the required folder
+            const zip = new AdmZip(downQPpath1);
+            zip.extractAllTo(extractPath, true);
+            console.log(`Files extracted to: ${extractPath}`);
+
+            // Delete ZIP after extraction
+            await fs.promises.unlink(downQPpath1);
+            console.log("ZIP file deleted after extraction.");
+          } catch (err) {
+            console.log(err);
+            return res
+              .status(500)
+              .json({"message":"Error during zip extraction" });
+          }
+          // Fetch the file from URL
           const mysqlPath = process.env.MYSQLPATH;
-  
+
           // Escape special characters in password
           const escapedPassword = process.env.DB_PASSWORD.replace(/"/g, '\\"');
-  
+
           const dumpFilePath = path.join(extractPath, `${sqlDB}.sql`);
-  
+
           console.log(dumpFilePath);
           // Construct the MySQL import command
           const command = `"${mysqlPath}" -u ${process.env.DB_USER} --password="${escapedPassword}" ${process.env.DB_NAME} < "${dumpFilePath}"`;
           // console.log("Executing command:", command);
-  
+
           try {
             // Execute the MySQL import command
             const { stdout, stderr } = await execAsync(command);
-  
             if (stderr) {
               console.error(`MySQL stderr: ${stderr}`);
             }
-  
+
             if (stdout) {
               console.log(`MySQL stdout: ${stdout}`);
             } else {
               console.log("MySQL executed successfully with no output.");
             }
             // let autoID= "1";
-  
+            let autoID = autoIDOne;
+            // if (autoID !== "" && mockDB === "") {
+            if (autoID !== "") {
+              const queries = [
+                `ALTER TABLE iib_candidate_test AUTO_INCREMENT = ${autoID}`,
+                `ALTER TABLE iib_candidate_scores AUTO_INCREMENT = ${autoID}`,
+              ];
+
+              queries.forEach((query) => {
+                db.query(query, (err, result) => {
+                  if (err) {
+                    console.error("Error updating AUTO_INCREMENT:", err);
+                  } else {
+                    console.log(
+                      "AUTO_INCREMENT updated successfully for:",
+                      query
+                    );
+                  }
+                });
+              });
+            }
+
+            // Insert into autofeed
+            const insertAutofeedSQL =
+              "INSERT INTO autofeed (center_code, serverno, autoid) VALUES (?, ?, ?)";
+            const formattedinsertAutofeedSQL = db.format(insertAutofeedSQL, [
+              ccode,
+              servernoVal,
+              1,
+            ]);
+            db.query(
+              insertAutofeedSQL,
+              [ccode, servernoVal, 1],
+              async (err) => {
+                if (err) {
+                  console.error("MySQL insert error:", err);
+                  return res
+                    .status(500)
+                    .json({ message: "Error inserting data into autofeed." });
+                }
+
+                // Insert the exact formatted query into xml_feed
+                //  insertIntoXmlFeed(formattedinsertAutofeedSQL, (err) => {
+                //    if (err) {
+                //      return db.rollback(() => {
+                //        console.error("Error inserting feed table:", err);
+                //        res.status(500).json({ message: "Internal Server Error" });
+                //      });
+                //    }
+                //  });
+              }
+            );
+
+            // const sqlInsert = `INSERT INTO qp_download (centre_code, serverno, download_sec, download_status, download_time) VALUES (?, ?, ?, ?, ?)`;
+            const sqlUpdate = `UPDATE qp_download SET serverno = ? , download_status = ? , download_time = ? WHERE centre_code = ? AND download_sec = ? `;
+            // const sqlUpdate = `UPDATE qp_download SET serverno = ? , download_status = ? WHERE centre_code = ?`;
+            const UpdateVal = [
+              servernoValOne,
+              "D",
+              formattedTime,
+              ccodeOne,
+              "Mac Address",
+            ];
+            const formattedsqlUpdate = db.format(sqlUpdate, UpdateVal);
+            db.query(sqlUpdate, UpdateVal, (err) => {
+              if (err) {
+                console.error("MySQL insert error:", err);
+                return res
+                  .status(500)
+                  .json({ message: "Internal Server Error" });
+              }
+
+              // Insert the exact formatted query into xml_feed
+              // insertIntoXmlFeed(formattedsqlUpdate, (err) => {
+              //   if (err) {
+              //     return db.rollback(() => {
+              //       console.error("Error inserting feed table:", err);
+              //       res.status(500).json({ message: "Internal Server Error" });
+              //     });
+              //   }
+              // });
+            });
+
             const sqlInsertBase = `INSERT INTO qp_download (centre_code, serverno, download_sec, download_status, download_time) VALUES (?, ?, ?, ?, ?)`;
             const formattedsqlInsertBase = db.format(sqlInsertBase, [
               ccodeOne,
               servernoValOne,
-              "Center QP",
+              "Base QP",
               "D",
               formattedTime,
             ]);
             db.query(
               sqlInsertBase,
-              [ccodeOne, servernoValOne, "Center QP", "D", formattedTime],
+              [ccodeOne, servernoValOne, "Base QP", "D", formattedTime],
               (err) => {
                 if (err) {
                   console.error("MySQL insert error:", err);
@@ -2081,7 +1883,7 @@ app.post("/activate/:status/:batch/:serialNumber/:qpStatus",async (req, res) => 
                     .status(500)
                     .json({ message: "Internal Server Error" });
                 }
-  
+
                 // Insert the exact formatted query into xml_feed
                 // insertIntoXmlFeed(formattedsqlInsertBase, (err) => {
                 //   if (err) {
@@ -2093,631 +1895,883 @@ app.post("/activate/:status/:batch/:serialNumber/:qpStatus",async (req, res) => 
                 // });
               }
             );
-  
-            const data_ealTwo = {
-              process: "3",
-              macId: serialNumber,
-              database: process.env.DB_NAME,
-              action: "",
-              serverNumber: servernoVal,
-              centreCode: ccode,
-            };
-  
-            // console.log(data_ealOne);
-            
-            const responseTwo = await axiosPrivate.post(
-              `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
-              data_ealTwo
-            );
-  
-            const res_ealTwo = responseTwo.data.data.split("^$^");
-            const responseCurlTwo = res_ealTwo[0];
-            const autoIDTwo = res_ealTwo[1];
-            const preTwo = res_ealTwo[2];
-            const posTwo = res_ealTwo[3];
-            const dPathTwo = res_ealTwo[4];
-            const servernoValTwo = res_ealTwo[5];
-            const ccodeTwo = res_ealTwo[6];
-  
-            console.log("Two", res_ealTwo);
-  
-            if (responseCurlTwo == "A") {
-              const qpfile = `${process.env.DEMOSERVER}${Buffer.from(dPathTwo, "base64").toString()}/images.zip`;
-              const downQPpath1 = `${process.env.DOWNQPPATH}\\images.zip`;
-              const sqlDB = "images";
-              const filename = Buffer.from(
-                `${Buffer.from(dPathTwo, "base64").toString()}/${sqlDB}.zip||${status}`
-              ).toString("base64");
-  
-              // const downQPpath1 = path.join("C:/pro/itest/activate", `${process.env.DB_NAME}.zip`);
-              // const extractPath = process.env.DOWNQPPATH; // Extract directly here
-              const extractPath = `${process.env.DOWNQPPATH}/image`;
-  
-              // let dumpFilePath = downQPpath1;
-  
-              // Fetch the file from URL
-              
-              const response = await axiosPrivate.post(
-                `${process.env.EXAM_DASHBOARD_URL}/getServerFiles`,
-                { pathcmd: filename },
-                {
-                  responseType: "stream", // ✅ Use "stream" to track progress properly
-                  httpsAgent: new https.Agent({ rejectUnauthorized: false }), // ⚠️ Only use in dev if SSL issues exist
-                  signal: controller.signal,
-                }
-              );
-  
-              if (response.status !== 200) {
-                console.error(
-                  `Failed to download file. HTTP Status: ${response.status}`
-                );
-                return res.status(500).json({
-                  success: "false",
-                  message: "Failed to download the file.",
-                });
-              }
-              const totalSize = response.headers["content-length"];
-              let downloadedSize = 0;
-              let lastChunkTime = Date.now();
-  
-              const writer = fs.createWriteStream(downQPpath1);
-  
-              response.data.on("data", (chunk) => {
-                downloadedSize += chunk.length;
-                lastChunkTime = Date.now();
-                const downloadPercentage = (
-                  (downloadedSize / totalSize) *
-                  100
-                ).toFixed(2);
-                // io.emit("download-percentage", {
-                //   percentage: downloadPercentage,
-                // });
-                console.log(`Downloaded: ${downloadedSize} / ${totalSize} bytes`);
-              });
-  
-              const downloadInterval = setInterval(() => {
-                if (Date.now() - lastChunkTime > 60000) {
-                  console.warn("Download stalled, aborting...");
-                  controller.abort();
-                  // if (!responseSent) {
-                  //   responseSent = true;
-                  clearInterval(downloadInterval);
-                  return res.status(500).json({
-                    success: "false",
-                    message: "Download failed due to inactivity.",
-                  });
-                  // }
-                }
-              }, 100);
-  
-              response.data.pipe(writer); // ✅ Stream file to disk instead of `writeFileSync`
-  
-              // Save the ZIP file locally
-              await new Promise((resolve, reject) => {
-                writer.on("finish", () => {
-                  clearInterval(downloadInterval);
-                  if (totalSize && downloadedSize.toString() !== totalSize) {
-                    console.error("File might be incomplete!");
-                    fs.unlinkSync(downQPpath1);
-                    return reject(new Error("Incomplete file download"));
-                  }
-  
-                  console.log("Download complete!");
-                  return resolve();
-                });
-  
-                writer.on("error", (err) => {
-                  clearInterval(downloadInterval);
-                  fs.unlinkSync(downQPpath1);
-                  return reject(err);
-                });
-              });
-  
-              console.log(`File downloaded and saved to: ${downQPpath1}`);
-  
-              // Extract ZIP file directly to the required folder
-              const zip = new AdmZip(downQPpath1);
-              zip.extractAllTo(extractPath, true);
-              console.log(`Files extracted to: ${extractPath}`);
-  
-              // Delete ZIP after extraction
-              fs.unlinkSync(downQPpath1);
-              console.log("ZIP file deleted after extraction.");
-  
-              try {
-                const sqlInsertBase = `INSERT INTO qp_download (centre_code, serverno, download_sec, download_status, download_time) VALUES (?, ?, ?, ?, ?)`;
-                const formattedsqlInsertBase = db.format(sqlInsertBase, [
-                  ccodeTwo,
-                  servernoValTwo,
-                  "Image",
-                  "D",
-                  formattedTime,
-                ]);
-                db.query(
-                  sqlInsertBase,
-                  [ccodeTwo, servernoValTwo, "Image", "D", formattedTime],
-                  (err) => {
-                    if (err) {
-                      console.error("MySQL insert error:", err);
-                      return res
-                        .status(500)
-                        .json({ message: "Internal Server Error" });
-                    }
-  
-                    // Insert the exact formatted query into xml_feed
-                    // insertIntoXmlFeed(formattedsqlInsertBase, (err) => {
-                    //   if (err) {
-                    //     return db.rollback(() => {
-                    //       console.error("Error inserting feed table:", err);
-                    //       res.status(500).json({ message: "Internal Server Error" });
-                    //     });
-                    //   }
-                    // });
-                  }
-                );
-  
-                // Send the response after both operations are successful
-                // return res.send("Dump file imported and PM2 process restarted successfully");
-              } catch (error) {
-                console.error("Error during process:", error);
-                return res
-                  .status(500)
-                  .json({message:"Error importing dump file or restarting PM2"});
-              }
-              // }
-            }
-            // }
-  
             // Send the response after both operations are successful
-            return res
-              .status(200)
-              .json({
-                message:
-                  "Dump file imported and PM2 process restarted successfully",
-              });
+            return res.status(200).json({message:"Dump file imported and PM2 process restarted successfully"});
           } catch (error) {
             console.error("Error during process:", error);
-            return res
-              .status(500)
-              .json({message:"Error importing dump file or restarting PM2"});
+            return res.status(500).json({message:"Error importing dump file or restarting PM2"});
           }
-          // }
         }
-      }catch(err){console.error("Error during process:", err.message);
-        return res.status(500).json({"message":"Error during Center QP download"});}
-      
+      }
+    }catch(error){
+      console.error("Error during process:", error.message);
+      return res.status(500).json({"message":"Error during base download"});
     }
-
-    if (status != "Base" && status != "Act" && qpStatus == 4) {
-      // console.log("statusstatusstatus",status);
-      const data_eal = {
-        process: "1",
-        macId: serialNumber,
-        database: process.env.DB_NAME,
-        action: "",
-        serverNumber: "",
-      };
-
-      console.log(data_eal);
-try{
-  
-  const response = await axiosPrivate.post(
-    `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
-    data_eal
-  );
-
-  const res_eal = response.data.data.split("^$^");
-  const responseCurl = res_eal[0];
-  const autoID = res_eal[1];
-  const pre = res_eal[2];
-  const pos = res_eal[3];
-  const dPath = res_eal[4];
-  const servernoVal = res_eal[5];
-  const ccode = res_eal[6];
-
-  const data_ealOne = {
-    process: "4",
-    macId: serialNumber,
-    database: process.env.DB_NAME,
-    action: "",
-    serverNumber: servernoVal,
-    centreCode: ccode,
-  };
-
-  // console.log(data_ealOne);
-  const responseOne = await axiosPrivate.post(
-    `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
-    data_ealOne
-  );
-
-  const res_ealOne = responseOne.data.data.split("^$^");
-  const responseCurlOne = res_ealOne[0];
-  const autoIDOne = res_ealOne[1];
-  const preOne = res_ealOne[2];
-  const posOne = res_ealOne[3];
-  const dPathOne = res_ealOne[4];
-  const servernoValOne = res_ealOne[5];
-  const ccodeOne = res_ealOne[6];
-
-  console.log("ONE", res_ealOne);
-
-  if (responseCurlOne == "A") {
-    const qpfile = `${process.env.DEMOSERVER}${Buffer.from(dPathOne, "base64").toString()}/${status}_photo.zip`;
-    const downQPpath1 = `${process.env.DOWNQPPATH}\\${status}_photo.zip`;
-    const sqlDB = `${status}_photo`; // centre_code_photo
-    const filename = Buffer.from(
-      `${Buffer.from(dPathOne, "base64").toString()}/${sqlDB}.zip||${status}_photo`
-    ).toString("base64");
-
-    const extractPath = `${process.env.DOWNQPPATH}/photo`;
-
-    // let dumpFilePath = downQPpath1;
-
-    // Fetch the file from URL
     
-    const response = await axiosPrivate.post(
-      `${process.env.EXAM_DASHBOARD_URL}/getServerFiles`,
-      { pathcmd: filename },
-      {
-        responseType: "stream", // ✅ Use "stream" to track progress properly
-        httpsAgent: new https.Agent({ rejectUnauthorized: false }), // ⚠️ Only use in dev if SSL issues exist
-        signal: controller.signal,
-      }
-    );
-
-    if (response.status !== 200) {
-      console.error(
-        `Failed to download file. HTTP Status: ${response.status}`
-      );
-      return res.status(500).json({
-        success: "false",
-        message: "Failed to download the file.",
-      });
-    }
-    const totalSize = response.headers["content-length"];
-    let downloadedSize = 0;
-    let lastChunkTime = Date.now();
-
-    const writer = fs.createWriteStream(downQPpath1);
-
-    response.data.on("data", (chunk) => {
-      downloadedSize += chunk.length;
-      lastChunkTime = Date.now();
-      const downloadPercentage = (
-        (downloadedSize / totalSize) *
-        100
-      ).toFixed(2);
-      // io.emit("download-percentage", { percentage: downloadPercentage });
-      console.log(`Downloaded: ${downloadedSize} / ${totalSize} bytes`);
-    });
-
-    const downloadInterval = setInterval(() => {
-      if (Date.now() - lastChunkTime > 60000) {
-        console.warn("Download stalled, aborting...");
-        controller.abort();
-        // if (!responseSent) {
-        //   responseSent = true;
-        clearInterval(downloadInterval);
-        return res.status(500).json({
-          success: "false",
-          message: "Download failed due to inactivity.",
-        });
-        // }
-      }
-    }, 100);
-
-    response.data.pipe(writer); // ✅ Stream file to disk instead of `writeFileSync`
-
-    // Save the ZIP file locally
-    await new Promise((resolve, reject) => {
-      writer.on("finish", () => {
-        clearInterval(downloadInterval);
-        if (totalSize && downloadedSize.toString() !== totalSize) {
-          console.error("File might be incomplete!");
-          fs.unlinkSync(downQPpath1);
-          return reject(new Error("Incomplete file download"));
-        }
-
-        console.log("Download complete!");
-        return resolve();
-      });
-
-      writer.on("error", (err) => {
-        clearInterval(downloadInterval);
-        fs.unlinkSync(downQPpath1);
-        return reject(err);
-      });
-    });
-
-    console.log(`File downloaded and saved to: ${downQPpath1}`);
-
-    // Extract ZIP file directly to the required folder
-    const zip = new AdmZip(downQPpath1);
-    zip.extractAllTo(extractPath, true);
-    console.log(`Files extracted to: ${extractPath}`);
-
-    // Delete ZIP after extraction
-    fs.unlinkSync(downQPpath1);
-    console.log("ZIP file deleted after extraction.");
-
-    try {
-      const sqlInsertBase = `INSERT INTO qp_download (centre_code, serverno, download_sec, download_status, download_time) VALUES (?, ?, ?, ?, ?)`;
-      const formattedsqlInsertBase = db.format(sqlInsertBase, [
-        ccodeOne,
-        servernoValOne,
-        "Photos",
-        "D",
-        formattedTime,
-      ]);
-      db.query(
-        sqlInsertBase,
-        [ccodeOne, servernoValOne, "Photos", "D", formattedTime],
-        (err) => {
-          if (err) {
-            console.error("MySQL insert error:", err);
-            return res
-              .status(500)
-              .json({ message: "Internal Server Error" });
-          }
-
-          // Insert the exact formatted query into xml_feed
-          // insertIntoXmlFeed(formattedsqlInsertBase, (err) => {
-          //   if (err) {
-          //     return db.rollback(() => {
-          //       console.error("Error inserting feed table:", err);
-          //       res.status(500).json({ message: "Internal Server Error" });
-          //     });
-          //   }
-          // });
-        }
-      );
-
-      // Send the response after both operations are successful
-      return res
-        .status(200)
-        .json({
-          message:
-            "Dump file imported and PM2 process restarted successfully",
-        });
-    } catch (error) {
-      console.error("Error during process:", error);
-      return res
-        .status(500)
-        .send("Error importing dump file or restarting PM2");
-    }
   }
 
-}catch(err){
-  console.error("Error during process:", err.message);
-        return res.status(500).json({"message":"Error during data download"});
-}
-   
-    }
+  if (status != "Base" && status != "Act" && qpStatus == 2) {
+    // console.log("statusstatusstatus",status);
+    const data_eal = {
+      process: "1",
+      macId: serialNumber,
+      database: process.env.DB_NAME,
+      action: "",
+      serverNumber: "",
+    };
 
-    if (status != "Base" && status != "Act" && qpStatus == 5) {
-      // console.log("statusstatusstatus",status);
-      const data_eal = {
-        process: "1",
+    console.log(data_eal);
+    try{
+      const response = await axios.post(
+        `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
+        data_eal
+        // {headers:
+        //   { Authorization: `Bearer ${apiToken}`,"Content-Type": "application/json",},
+        //       withCredentials: true,}
+      );
+
+      const res_eal = response.data.data.split("^$^");
+      const responseCurl = res_eal[0];
+      const autoID = res_eal[1];
+      const pre = res_eal[2];
+      const pos = res_eal[3];
+      const dPath = res_eal[4];
+      const servernoVal = res_eal[5];
+      const ccode = res_eal[6];
+
+      const data_ealOne = {
+        process: "2",
         macId: serialNumber,
         database: process.env.DB_NAME,
         action: "",
-        serverNumber: "",
-      };
-
-      console.log(data_eal);
-try{
-
-  
-  const response = await axiosPrivate.post(
-    `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
-    data_eal
-  );
-
-  const res_eal = response.data.data.split("^$^");
-  const responseCurl = res_eal[0];
-  const autoID = res_eal[1];
-  const pre = res_eal[2];
-  const pos = res_eal[3];
-  const dPath = res_eal[4];
-  const servernoVal = res_eal[5];
-  const ccode = res_eal[6];
-
-  const data_ealOne = {
-    process: "5",
-    macId: serialNumber,
-    database: process.env.DB_NAME,
-    action: "",
-    serverNumber: servernoVal,
-    centreCode: ccode,
-  };
-
-  // console.log(data_ealOne);
-  const responseOne = await axiosPrivate.post(
-    `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
-    data_ealOne
-  );
-
-  const res_ealOne = responseOne.data.data.split("^$^");
-  const responseCurlOne = res_ealOne[0];
-  const autoIDOne = res_ealOne[1];
-  const preOne = res_ealOne[2];
-  const posOne = res_ealOne[3];
-  const dPathOne = res_ealOne[4];
-  const servernoValOne = res_ealOne[5];
-  const ccodeOne = res_ealOne[6];
-
-  console.log("ONE", res_ealOne);
-
-  if (responseCurlOne == "A") {
-    const qpfile = `${process.env.DEMOSERVER}${Buffer.from(dPathOne, "base64").toString()}/${status}_sign.zip`;
-    const downQPpath1 = `${process.env.DOWNQPPATH}\\${status}_sign.zip`;
-    const sqlDB = `${status}_sign`; // centre_code_sign
-    const filename = Buffer.from(
-      `${Buffer.from(dPathOne, "base64").toString()}/${sqlDB}.zip||${status}_sign`
-    ).toString("base64");
-
-    // const downQPpath1 = path.join("C:/pro/itest/activate", `${process.env.DB_NAME}.zip`);
-    const extractPath = `${process.env.DOWNQPPATH}/sign`; // Extract directly here
-
-    // let dumpFilePath = downQPpath1;
-
-    // Fetch the file from URL
-    console.log("starting download");
-    
-    const response = await axiosPrivate.post(
-      `${process.env.EXAM_DASHBOARD_URL}/getServerFiles`,
-      { pathcmd: filename },
-      {
-        responseType: "stream", // ✅ Use "stream" to track progress properly
-        httpsAgent: new https.Agent({ rejectUnauthorized: false }), // ⚠️ Only use in dev if SSL issues exist
-        signal: controller.signal,
-      }
-    );
-
-    if (response.status !== 200) {
-      console.error(
-        `Failed to download file. HTTP Status: ${response.status}`
-      );
-      return res.json({
-        success: "false",
-        message: "Failed to download the file.",
-      });
-    }
-    const totalSize = response.headers["content-length"];
-    let downloadedSize = 0;
-    let lastChunkTime = Date.now();
-
-    const writer = fs.createWriteStream(downQPpath1);
-
-    response.data.on("data", (chunk) => {
-      downloadedSize += chunk.length;
-      lastChunkTime = Date.now();
-      const downloadPercentage = (
-        (downloadedSize / totalSize) *
-        100
-      ).toFixed(2);
-      // io.emit("download-percentage", { percentage: downloadPercentage });
-      console.log(`Downloaded: ${downloadedSize} / ${totalSize} bytes`);
-    });
-
-    const downloadInterval = setInterval(() => {
-      if (Date.now() - lastChunkTime > 60000) {
-        console.warn("Download stalled, aborting...");
-        controller.abort();
-        // if (!responseSent) {
-        //   responseSent = true;
-        clearInterval(downloadInterval);
-        return res.status(500).send({
-          success: "false",
-          message: "Download failed due to inactivity.",
-        });
-        // }
-      }
-    }, 100);
-
-    response.data.pipe(writer); // ✅ Stream file to disk instead of `writeFileSync`
-
-    // Save the ZIP file locally
-    await new Promise((resolve, reject) => {
-      writer.on("finish", () => {
-        clearInterval(downloadInterval);
-        if (totalSize && downloadedSize.toString() !== totalSize) {
-          console.error("File might be incomplete!");
-          fs.unlinkSync(downQPpath1);
-          return reject(new Error("Incomplete file download"));
-        }
-
-        console.log("Download complete!");
-        return resolve();
-      });
-
-      writer.on("error", (err) => {
-        clearInterval(downloadInterval);
-        fs.unlinkSync(downQPpath1);
-        return reject(err);
-      });
-    });
-
-    console.log(`File downloaded and saved to: ${downQPpath1}`);
-
-    // Extract ZIP file directly to the required folder
-    const zip = new AdmZip(downQPpath1);
-    zip.extractAllTo(extractPath, true);
-    console.log(`Files extracted to: ${extractPath}`);
-
-    // Delete ZIP after extraction
-    fs.unlinkSync(downQPpath1);
-    console.log("ZIP file deleted after extraction.");
-
-    try {
-      const sqlInsertBase = `INSERT INTO qp_download (centre_code, serverno, download_sec, download_status, download_time) VALUES (?, ?, ?, ?, ?)`;
-      const formattedsqlInsertBase = db.format(sqlInsertBase, [
-        ccodeOne,
-        servernoValOne,
-        "Sign",
-        "D",
-        formattedTime,
-      ]);
-      db.query(
-        sqlInsertBase,
-        [ccodeOne, servernoValOne, "Sign", "D", formattedTime],
-        (err) => {
-          if (err) {
-            console.error("MySQL insert error:", err);
-            return res
-              .status(500)
-              .json({ message: "Internal Server Error" });
-          }
-
-          // Insert the exact formatted query into xml_feed
-          // insertIntoXmlFeed(formattedsqlInsertBase, (err) => {
-          //   if (err) {
-          //     return db.rollback(() => {
-          //       console.error("Error inserting feed table:", err);
-          //       res.status(500).json({ message: "Internal Server Error" });
-          //     });
-          //   }
-          // });
-        }
-      );
-
-      const data_ealStatus = {
-        process: "6",
-        macId: serialNumber,
-        database: process.env.DB_NAME,
         serverNumber: servernoVal,
+        centreCode: ccode,
       };
 
       // console.log(data_ealOne);
-      
-      const responseStatus = await axiosPrivate.post(
-        `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
-        data_ealStatus
-      );
-      console.log(responseStatus);
 
-      // Send the response after both operations are successful
-      return res
-        .status(200)
-        .json({
-          message:
-            "Dump file imported and PM2 process restarted successfully",
+      const responseOne = await axios.post(
+        `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
+        data_ealOne
+        // {headers:
+        //   { Authorization: `Bearer ${apiToken}`,"Content-Type": "application/json",},
+        //       withCredentials: true,}
+      );
+
+      const res_ealOne = responseOne.data.data.split("^$^");
+      const responseCurlOne = res_ealOne[0];
+      const autoIDOne = res_ealOne[1];
+      const preOne = res_ealOne[2];
+      const posOne = res_ealOne[3];
+      const dPathOne = res_ealOne[4];
+      const servernoValOne = res_ealOne[5];
+      const ccodeOne = res_ealOne[6];
+
+      console.log("ONE", res_ealOne);
+
+      if (responseCurlOne == "A") {
+        const qpfile = `${process.env.DEMOSERVER}${Buffer.from(dPathOne, "base64").toString()}/${status}.zip`;
+        const downQPpath1 = `${process.env.DOWNQPPATH}\\${status}.zip`;
+        const sqlDB = status; // centre code = status
+        const filename = Buffer.from(
+          `${Buffer.from(dPathOne, "base64").toString()}/${sqlDB}.zip||${status}`
+        ).toString("base64");
+
+        // const downQPpath1 = path.join("C:/pro/itest/activate", `${process.env.DB_NAME}.zip`);
+        const extractPath = process.env.DOWNQPPATH; // Extract directly here
+
+        // let dumpFilePath = downQPpath1;
+
+        const response = await axios.post(
+          `${process.env.EXAM_DASHBOARD_URL}/getServerFiles`,
+          { pathcmd: filename },
+          {
+            responseType: "stream", // ✅ Use "stream" to track progress properly
+            httpsAgent: new https.Agent({ rejectUnauthorized: false }), // ⚠️ Only use in dev if SSL issues exist
+            signal: controller.signal,
+          }
+        );
+
+        if (response.status !== 200) {
+          console.error(
+            `Failed to download file. HTTP Status: ${response.status}`
+          );
+          return res.status(500).json({
+            success: "false",
+            message: "Failed to download the file.",
+          });
+        }
+        const totalSize = response.headers["content-length"];
+        let downloadedSize = 0;
+        let lastChunkTime = Date.now();
+
+        const writer = fs.createWriteStream(downQPpath1);
+
+        response.data.on("data", (chunk) => {
+          downloadedSize += chunk.length;
+          lastChunkTime = Date.now();
+          const downloadPercentage = (
+            (downloadedSize / totalSize) *
+            100
+          ).toFixed(2);
+          // io.emit("download-centerqp", { percentage: downloadPercentage });
+          console.log(`Downloaded: ${downloadedSize} / ${totalSize} bytes`);
         });
-    } catch (error) {
-      console.error("Error during process:", error);
-      return res
-        .status(500)
-        .send("Error importing dump file or restarting PM2");
-    }
-  }
-}catch(err){
-  console.error("Error during process:", err.message);
-        return res.status(500).json({"message":"Error during data download"});
-}
+
+        const downloadInterval = setInterval(() => {
+          if (Date.now() - lastChunkTime > 60000) {
+            console.warn("Download stalled, aborting...");
+            controller.abort();
+            // if (!responseSent) {
+            //   responseSent = true;
+            clearInterval(downloadInterval);
+            return res.status(500).json({
+              success: "false",
+              message: "Download failed due to inactivity.",
+            });
+            // }
+          }
+        }, 100);
+
+        response.data.pipe(writer); // ✅ Stream file to disk instead of `writeFileSync`
+
+        // Save the ZIP file locally
+        await new Promise((resolve, reject) => {
+          writer.on("finish", () => {
+            clearInterval(downloadInterval);
+            if (totalSize && downloadedSize.toString() !== totalSize) {
+              console.error("File might be incomplete!");
+              fs.unlinkSync(downQPpath1);
+              return reject(new Error("Incomplete file download"));
+            }
+
+            console.log("Download complete!");
+            return resolve();
+          });
+
+          writer.on("error", (err) => {
+            clearInterval(downloadInterval);
+            fs.unlinkSync(downQPpath1);
+            return reject(err);
+          });
+        });
+
+        console.log(`File downloaded and saved to: ${downQPpath1}`);
+
+        // Extract ZIP file directly to the required folder
+        const zip = new AdmZip(downQPpath1);
+        zip.extractAllTo(extractPath, true);
+        console.log(`Files extracted to: ${extractPath}`);
+
+        const qp_output = path.join(extractPath, `${status}.sql`);
+        let sqlContent = fs.readFileSync(qp_output, "utf8");
+        sqlContent = sqlContent.replace(/_temp/g, "");
+        fs.writeFileSync(qp_output, sqlContent, "utf8");
+
+        // Delete ZIP after extraction
+        fs.unlinkSync(downQPpath1);
+        console.log("ZIP file deleted after extraction.");
+
+        const mysqlPath = process.env.MYSQLPATH;
+
+        // Escape special characters in password
+        const escapedPassword = process.env.DB_PASSWORD.replace(/"/g, '\\"');
+
+        const dumpFilePath = path.join(extractPath, `${sqlDB}.sql`);
+
+        console.log(dumpFilePath);
+        // Construct the MySQL import command
+        const command = `"${mysqlPath}" -u ${process.env.DB_USER} --password="${escapedPassword}" ${process.env.DB_NAME} < "${dumpFilePath}"`;
+        // console.log("Executing command:", command);
+
+        try {
+          // Execute the MySQL import command
+          const { stdout, stderr } = await execAsync(command);
+
+          if (stderr) {
+            console.error(`MySQL stderr: ${stderr}`);
+          }
+
+          if (stdout) {
+            console.log(`MySQL stdout: ${stdout}`);
+          } else {
+            console.log("MySQL executed successfully with no output.");
+          }
+          // let autoID= "1";
+
+          const sqlInsertBase = `INSERT INTO qp_download (centre_code, serverno, download_sec, download_status, download_time) VALUES (?, ?, ?, ?, ?)`;
+          const formattedsqlInsertBase = db.format(sqlInsertBase, [
+            ccodeOne,
+            servernoValOne,
+            "Center QP",
+            "D",
+            formattedTime,
+          ]);
+          db.query(
+            sqlInsertBase,
+            [ccodeOne, servernoValOne, "Center QP", "D", formattedTime],
+            (err) => {
+              if (err) {
+                console.error("MySQL insert error:", err);
+                return res
+                  .status(500)
+                  .json({ message: "Internal Server Error" });
+              }
+
+              // Insert the exact formatted query into xml_feed
+              // insertIntoXmlFeed(formattedsqlInsertBase, (err) => {
+              //   if (err) {
+              //     return db.rollback(() => {
+              //       console.error("Error inserting feed table:", err);
+              //       res.status(500).json({ message: "Internal Server Error" });
+              //     });
+              //   }
+              // });
+            }
+          );
+
+          const data_ealTwo = {
+            process: "3",
+            macId: serialNumber,
+            database: process.env.DB_NAME,
+            action: "",
+            serverNumber: servernoVal,
+            centreCode: ccode,
+          };
+
+          // console.log(data_ealOne);
+
+          const responseTwo = await axios.post(
+            `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
+            data_ealTwo
+            // {headers:
+            //   { Authorization: `Bearer ${apiToken}`,"Content-Type": "application/json",},
+            //       withCredentials: true,}
+          );
+
+          const res_ealTwo = responseTwo.data.data.split("^$^");
+          const responseCurlTwo = res_ealTwo[0];
+          const autoIDTwo = res_ealTwo[1];
+          const preTwo = res_ealTwo[2];
+          const posTwo = res_ealTwo[3];
+          const dPathTwo = res_ealTwo[4];
+          const servernoValTwo = res_ealTwo[5];
+          const ccodeTwo = res_ealTwo[6];
+
+          console.log("Two", res_ealTwo);
+
+          if (responseCurlTwo == "A") {
+            const qpfile = `${process.env.DEMOSERVER}${Buffer.from(dPathTwo, "base64").toString()}/images.zip`;
+            const downQPpath1 = `${process.env.DOWNQPPATH}\\images.zip`;
+            const sqlDB = "images";
+            const filename = Buffer.from(
+              `${Buffer.from(dPathTwo, "base64").toString()}/${sqlDB}.zip||${status}`
+            ).toString("base64");
+
+            // const downQPpath1 = path.join("C:/pro/itest/activate", `${process.env.DB_NAME}.zip`);
+            // const extractPath = process.env.DOWNQPPATH; // Extract directly here
+            const extractPath = `${process.env.DOWNQPPATH}/image`;
+
+            // let dumpFilePath = downQPpath1;
+
+            // Fetch the file from URL
+
+            const response = await axios.post(
+              `${process.env.EXAM_DASHBOARD_URL}/getServerFiles`,
+              { pathcmd: filename },
+              {
+                responseType: "stream", // ✅ Use "stream" to track progress properly
+                httpsAgent: new https.Agent({ rejectUnauthorized: false }), // ⚠️ Only use in dev if SSL issues exist
+                signal: controller.signal,
+              }
+            );
+
+            if (response.status !== 200) {
+              console.error(
+                `Failed to download file. HTTP Status: ${response.status}`
+              );
+              return res.status(500).json({
+                success: "false",
+                message: "Failed to download the file.",
+              });
+            }
+            const totalSize = response.headers["content-length"];
+            let downloadedSize = 0;
+            let lastChunkTime = Date.now();
+
+            const writer = fs.createWriteStream(downQPpath1);
+
+            response.data.on("data", (chunk) => {
+              downloadedSize += chunk.length;
+              lastChunkTime = Date.now();
+              const downloadPercentage = (
+                (downloadedSize / totalSize) *
+                100
+              ).toFixed(2);
+              // io.emit("download-percentage", {
+              //   percentage: downloadPercentage,
+              // });
+              console.log(`Downloaded: ${downloadedSize} / ${totalSize} bytes`);
+            });
+
+            const downloadInterval = setInterval(() => {
+              if (Date.now() - lastChunkTime > 60000) {
+                console.warn("Download stalled, aborting...");
+                controller.abort();
+                // if (!responseSent) {
+                //   responseSent = true;
+                clearInterval(downloadInterval);
+                return res.status(500).json({
+                  success: "false",
+                  message: "Download failed due to inactivity.",
+                });
+                // }
+              }
+            }, 100);
+
+            response.data.pipe(writer); // ✅ Stream file to disk instead of `writeFileSync`
+
+            // Save the ZIP file locally
+            await new Promise((resolve, reject) => {
+              writer.on("finish", () => {
+                clearInterval(downloadInterval);
+                if (totalSize && downloadedSize.toString() !== totalSize) {
+                  console.error("File might be incomplete!");
+                  fs.unlinkSync(downQPpath1);
+                  return reject(new Error("Incomplete file download"));
+                }
+
+                console.log("Download complete!");
+                return resolve();
+              });
+
+              writer.on("error", (err) => {
+                clearInterval(downloadInterval);
+                fs.unlinkSync(downQPpath1);
+                return reject(err);
+              });
+            });
+
+            console.log(`File downloaded and saved to: ${downQPpath1}`);
+
+            // Extract ZIP file directly to the required folder
+            const zip = new AdmZip(downQPpath1);
+            zip.extractAllTo(extractPath, true);
+            console.log(`Files extracted to: ${extractPath}`);
+
+            // Delete ZIP after extraction
+            fs.unlinkSync(downQPpath1);
+            console.log("ZIP file deleted after extraction.");
+
+            try {
+              const sqlInsertBase = `INSERT INTO qp_download (centre_code, serverno, download_sec, download_status, download_time) VALUES (?, ?, ?, ?, ?)`;
+              const formattedsqlInsertBase = db.format(sqlInsertBase, [
+                ccodeTwo,
+                servernoValTwo,
+                "Image",
+                "D",
+                formattedTime,
+              ]);
+              db.query(
+                sqlInsertBase,
+                [ccodeTwo, servernoValTwo, "Image", "D", formattedTime],
+                (err) => {
+                  if (err) {
+                    console.error("MySQL insert error:", err);
+                    return res
+                      .status(500)
+                      .json({ message: "Internal Server Error" });
+                  }
+
+                  // Insert the exact formatted query into xml_feed
+                  // insertIntoXmlFeed(formattedsqlInsertBase, (err) => {
+                  //   if (err) {
+                  //     return db.rollback(() => {
+                  //       console.error("Error inserting feed table:", err);
+                  //       res.status(500).json({ message: "Internal Server Error" });
+                  //     });
+                  //   }
+                  // });
+                }
+              );
+
+              // Send the response after both operations are successful
+              // return res.send("Dump file imported and PM2 process restarted successfully");
+            } catch (error) {
+              console.error("Error during process:", error);
+              return res
+                .status(500)
+                .json({message:"Error importing dump file or restarting PM2"});
+            }
+            // }
+          }
+          // }
+
+          // Send the response after both operations are successful
+          return res
+            .status(200)
+            .json({
+              message:
+                "Dump file imported and PM2 process restarted successfully",
+            });
+        } catch (error) {
+          console.error("Error during process:", error);
+          return res
+            .status(500)
+            .json({message:"Error importing dump file or restarting PM2"});
+        }
+        // }
+      }
+    }catch(err){console.error("Error during process:", err.message);
+      return res.status(500).json({"message":"Error during Center QP download"});}
     
-    }
   }
+
+  if (status != "Base" && status != "Act" && qpStatus == 4) {
+    // console.log("statusstatusstatus",status);
+    const data_eal = {
+      process: "1",
+      macId: serialNumber,
+      database: process.env.DB_NAME,
+      action: "",
+      serverNumber: "",
+    };
+
+    console.log(data_eal);
+try{
+const response = await axios.post(
+  `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
+  data_eal
+  // {headers:
+  //   { Authorization: `Bearer ${apiToken}`,"Content-Type": "application/json",},
+  //       withCredentials: true,}
 );
+
+const res_eal = response.data.data.split("^$^");
+const responseCurl = res_eal[0];
+const autoID = res_eal[1];
+const pre = res_eal[2];
+const pos = res_eal[3];
+const dPath = res_eal[4];
+const servernoVal = res_eal[5];
+const ccode = res_eal[6];
+
+const data_ealOne = {
+  process: "4",
+  macId: serialNumber,
+  database: process.env.DB_NAME,
+  action: "",
+  serverNumber: servernoVal,
+  centreCode: ccode,
+};
+
+// console.log(data_ealOne);
+
+const responseOne = await axios.post(
+  `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
+  data_ealOne
+  // {headers:
+  //   { Authorization: `Bearer ${apiToken}`,"Content-Type": "application/json",},
+  //       withCredentials: true,}
+);
+
+const res_ealOne = responseOne.data.data.split("^$^");
+const responseCurlOne = res_ealOne[0];
+const autoIDOne = res_ealOne[1];
+const preOne = res_ealOne[2];
+const posOne = res_ealOne[3];
+const dPathOne = res_ealOne[4];
+const servernoValOne = res_ealOne[5];
+const ccodeOne = res_ealOne[6];
+
+console.log("ONE", res_ealOne);
+
+if (responseCurlOne == "A") {
+  const qpfile = `${process.env.DEMOSERVER}${Buffer.from(dPathOne, "base64").toString()}/${status}_photo.zip`;
+  const downQPpath1 = `${process.env.DOWNQPPATH}\\${status}_photo.zip`;
+  const sqlDB = `${status}_photo`; // centre_code_photo
+  const filename = Buffer.from(
+    `${Buffer.from(dPathOne, "base64").toString()}/${sqlDB}.zip||${status}_photo`
+  ).toString("base64");
+
+  const extractPath = `${process.env.DOWNQPPATH}/photo`;
+
+  // let dumpFilePath = downQPpath1;
+
+  // Fetch the file from URL
+
+  const response = await axios.post(
+    `${process.env.EXAM_DASHBOARD_URL}/getServerFiles`,
+    { pathcmd: filename },
+    {
+      responseType: "stream", // ✅ Use "stream" to track progress properly
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }), // ⚠️ Only use in dev if SSL issues exist
+      signal: controller.signal,
+    }
+  );
+
+  if (response.status !== 200) {
+    console.error(
+      `Failed to download file. HTTP Status: ${response.status}`
+    );
+    return res.status(500).json({
+      success: "false",
+      message: "Failed to download the file.",
+    });
+  }
+  const totalSize = response.headers["content-length"];
+  let downloadedSize = 0;
+  let lastChunkTime = Date.now();
+
+  const writer = fs.createWriteStream(downQPpath1);
+
+  response.data.on("data", (chunk) => {
+    downloadedSize += chunk.length;
+    lastChunkTime = Date.now();
+    const downloadPercentage = (
+      (downloadedSize / totalSize) *
+      100
+    ).toFixed(2);
+    // io.emit("download-photos", { percentage: downloadPercentage });
+    console.log(`Downloaded: ${downloadedSize} / ${totalSize} bytes`);
+  });
+
+  const downloadInterval = setInterval(() => {
+    if (Date.now() - lastChunkTime > 60000) {
+      console.warn("Download stalled, aborting...");
+      controller.abort();
+      // if (!responseSent) {
+      //   responseSent = true;
+      clearInterval(downloadInterval);
+      return res.status(500).json({
+        success: "false",
+        message: "Download failed due to inactivity.",
+      });
+      // }
+    }
+  }, 100);
+
+  response.data.pipe(writer); // ✅ Stream file to disk instead of `writeFileSync`
+
+  // Save the ZIP file locally
+  await new Promise((resolve, reject) => {
+    writer.on("finish", () => {
+      clearInterval(downloadInterval);
+      if (totalSize && downloadedSize.toString() !== totalSize) {
+        console.error("File might be incomplete!");
+        fs.unlinkSync(downQPpath1);
+        return reject(new Error("Incomplete file download"));
+      }
+
+      console.log("Download complete!");
+      return resolve();
+    });
+
+    writer.on("error", (err) => {
+      clearInterval(downloadInterval);
+      fs.unlinkSync(downQPpath1);
+      return reject(err);
+    });
+  });
+
+  console.log(`File downloaded and saved to: ${downQPpath1}`);
+
+  // Extract ZIP file directly to the required folder
+  const zip = new AdmZip(downQPpath1);
+  zip.extractAllTo(extractPath, true);
+  console.log(`Files extracted to: ${extractPath}`);
+
+  // Delete ZIP after extraction
+  fs.unlinkSync(downQPpath1);
+  console.log("ZIP file deleted after extraction.");
+
+  try {
+    const sqlInsertBase = `INSERT INTO qp_download (centre_code, serverno, download_sec, download_status, download_time) VALUES (?, ?, ?, ?, ?)`;
+    const formattedsqlInsertBase = db.format(sqlInsertBase, [
+      ccodeOne,
+      servernoValOne,
+      "Photos",
+      "D",
+      formattedTime,
+    ]);
+    db.query(
+      sqlInsertBase,
+      [ccodeOne, servernoValOne, "Photos", "D", formattedTime],
+      (err) => {
+        if (err) {
+          console.error("MySQL insert error:", err);
+          return res
+            .status(500)
+            .json({ message: "Internal Server Error" });
+        }
+
+        // Insert the exact formatted query into xml_feed
+        // insertIntoXmlFeed(formattedsqlInsertBase, (err) => {
+        //   if (err) {
+        //     return db.rollback(() => {
+        //       console.error("Error inserting feed table:", err);
+        //       res.status(500).json({ message: "Internal Server Error" });
+        //     });
+        //   }
+        // });
+      }
+    );
+
+    // Send the response after both operations are successful
+    return res
+      .status(200)
+      .json({
+        message:
+          "Dump file imported and PM2 process restarted successfully",
+      });
+  } catch (error) {
+    console.error("Error during process:", error);
+    return res
+      .status(500)
+      .send("Error importing dump file or restarting PM2");
+  }
+}
+
+}catch(err){
+console.error("Error during process:", err.message);
+      return res.status(500).json({"message":"Error during data download"});
+}
+ 
+  }
+
+  if (status != "Base" && status != "Act" && qpStatus == 5) {
+    // console.log("statusstatusstatus",status);
+    const data_eal = {
+      process: "1",
+      macId: serialNumber,
+      database: process.env.DB_NAME,
+      action: "",
+      serverNumber: "",
+    };
+
+    console.log(data_eal);
+try{
+
+const response = await axios.post(
+  `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
+  data_eal
+  // {headers:
+  //   { Authorization: `Bearer ${apiToken}`,"Content-Type": "application/json",},
+  //       withCredentials: true,}
+);
+
+const res_eal = response.data.data.split("^$^");
+const responseCurl = res_eal[0];
+const autoID = res_eal[1];
+const pre = res_eal[2];
+const pos = res_eal[3];
+const dPath = res_eal[4];
+const servernoVal = res_eal[5];
+const ccode = res_eal[6];
+
+const data_ealOne = {
+  process: "5",
+  macId: serialNumber,
+  database: process.env.DB_NAME,
+  action: "",
+  serverNumber: servernoVal,
+  centreCode: ccode,
+};
+
+// console.log(data_ealOne);
+
+const responseOne = await axios.post(
+  `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
+  data_ealOne
+  // {headers:
+  //   { Authorization: `Bearer ${apiToken}`,"Content-Type": "application/json",},
+  //       withCredentials: true,}
+);
+
+const res_ealOne = responseOne.data.data.split("^$^");
+const responseCurlOne = res_ealOne[0];
+const autoIDOne = res_ealOne[1];
+const preOne = res_ealOne[2];
+const posOne = res_ealOne[3];
+const dPathOne = res_ealOne[4];
+const servernoValOne = res_ealOne[5];
+const ccodeOne = res_ealOne[6];
+
+console.log("ONE", res_ealOne);
+
+if (responseCurlOne == "A") {
+  const qpfile = `${process.env.DEMOSERVER}${Buffer.from(dPathOne, "base64").toString()}/${status}_sign.zip`;
+  const downQPpath1 = `${process.env.DOWNQPPATH}\\${status}_sign.zip`;
+  const sqlDB = `${status}_sign`; // centre_code_sign
+  const filename = Buffer.from(
+    `${Buffer.from(dPathOne, "base64").toString()}/${sqlDB}.zip||${status}_sign`
+  ).toString("base64");
+
+  // const downQPpath1 = path.join("C:/pro/itest/activate", `${process.env.DB_NAME}.zip`);
+  const extractPath = `${process.env.DOWNQPPATH}/sign`; // Extract directly here
+
+  // let dumpFilePath = downQPpath1;
+
+  // Fetch the file from URL
+  console.log("starting download")
+  const response = await axios.post(
+    `${process.env.EXAM_DASHBOARD_URL}/getServerFiles`,
+    { pathcmd: filename },
+    {
+      responseType: "stream", // ✅ Use "stream" to track progress properly
+      httpsAgent: new https.Agent({ rejectUnauthorized: false }), // ⚠️ Only use in dev if SSL issues exist
+      signal: controller.signal,
+    }
+  );
+
+  if (response.status !== 200) {
+    console.error(
+      `Failed to download file. HTTP Status: ${response.status}`
+    );
+    return res.json({
+      success: "false",
+      message: "Failed to download the file.",
+    });
+  }
+  const totalSize = response.headers["content-length"];
+  let downloadedSize = 0;
+  let lastChunkTime = Date.now();
+
+  const writer = fs.createWriteStream(downQPpath1);
+
+  response.data.on("data", (chunk) => {
+    downloadedSize += chunk.length;
+    lastChunkTime = Date.now();
+    const downloadPercentage = (
+      (downloadedSize / totalSize) *
+      100
+    ).toFixed(2);
+    // io.emit("download-sign", { percentage: downloadPercentage });
+    console.log(`Downloaded: ${downloadedSize} / ${totalSize} bytes`);
+  });
+
+  const downloadInterval = setInterval(() => {
+    if (Date.now() - lastChunkTime > 60000) {
+      console.warn("Download stalled, aborting...");
+      controller.abort();
+      // if (!responseSent) {
+      //   responseSent = true;
+      clearInterval(downloadInterval);
+      return res.status(500).send({
+        success: "false",
+        message: "Download failed due to inactivity.",
+      });
+      // }
+    }
+  }, 100);
+
+  response.data.pipe(writer); // ✅ Stream file to disk instead of `writeFileSync`
+
+  // Save the ZIP file locally
+  await new Promise((resolve, reject) => {
+    writer.on("finish", () => {
+      clearInterval(downloadInterval);
+      if (totalSize && downloadedSize.toString() !== totalSize) {
+        console.error("File might be incomplete!");
+        fs.unlinkSync(downQPpath1);
+        return reject(new Error("Incomplete file download"));
+      }
+
+      console.log("Download complete!");
+      return resolve();
+    });
+
+    writer.on("error", (err) => {
+      clearInterval(downloadInterval);
+      fs.unlinkSync(downQPpath1);
+      return reject(err);
+    });
+  });
+
+  console.log(`File downloaded and saved to: ${downQPpath1}`);
+
+  // Extract ZIP file directly to the required folder
+  const zip = new AdmZip(downQPpath1);
+  zip.extractAllTo(extractPath, true);
+  console.log(`Files extracted to: ${extractPath}`);
+
+  // Delete ZIP after extraction
+  fs.unlinkSync(downQPpath1);
+  console.log("ZIP file deleted after extraction.");
+
+  try {
+    const sqlInsertBase = `INSERT INTO qp_download (centre_code, serverno, download_sec, download_status, download_time) VALUES (?, ?, ?, ?, ?)`;
+    const formattedsqlInsertBase = db.format(sqlInsertBase, [
+      ccodeOne,
+      servernoValOne,
+      "Sign",
+      "D",
+      formattedTime,
+    ]);
+    db.query(
+      sqlInsertBase,
+      [ccodeOne, servernoValOne, "Sign", "D", formattedTime],
+      (err) => {
+        if (err) {
+          console.error("MySQL insert error:", err);
+          return res
+            .status(500)
+            .json({ message: "Internal Server Error" });
+        }
+
+        // Insert the exact formatted query into xml_feed
+        // insertIntoXmlFeed(formattedsqlInsertBase, (err) => {
+        //   if (err) {
+        //     return db.rollback(() => {
+        //       console.error("Error inserting feed table:", err);
+        //       res.status(500).json({ message: "Internal Server Error" });
+        //     });
+        //   }
+        // });
+      }
+    );
+
+    const data_ealStatus = {
+      process: "6",
+      macId: serialNumber,
+      database: process.env.DB_NAME,
+      serverNumber: servernoVal,
+    };
+
+    // console.log(data_ealOne);
+
+    const responseStatus = await axios.post(
+      `${process.env.EXAM_DASHBOARD_URL}/dataDownload`,
+      data_ealStatus
+      // {headers:
+      //   { Authorization: `Bearer ${apiToken}`,"Content-Type": "application/json",},
+      //       withCredentials: true,}
+    );
+    console.log(responseStatus);
+
+    // Send the response after both operations are successful
+    return res
+      .status(200)
+      .json({
+        message:
+          "Dump file imported and PM2 process restarted successfully",
+      });
+  } catch (error) {
+    console.error("Error during process:", error);
+    return res
+      .status(500)
+      .json({"message":"Error importing dump file or restarting PM2"});
+  }
+}
+}catch(err){
+console.error("Error during process:", err.message);
+      return res.status(500).json({"message":"Error during data download"});
+}
+  
+  }
+}
+);
+
 //  Demo Working code
 // app.post("/activate/:status/:batch/:serialNumber/:qpStatus", async (req, res) => {
 //   const { status, batch, serialNumber, qpStatus} = req.params;
@@ -3758,8 +3812,10 @@ app.post("/insert-base", async (req, res) => {
           };
 
           console.log(data_eal);
-          
-          axiosPrivate.post(`${process.env.EXAM_DASHBOARD_URL}/autoAssignServerNumber`,
+
+          axios
+            .post(
+              `${process.env.EXAM_DASHBOARD_URL}/autoAssignServerNumber`,
               data_eal
             )
             .then((response) => {
@@ -5452,8 +5508,7 @@ app.get(
       }
 
       //  const response = await axios.post(`${process.env.EXAM_DASHBOARD_URL}/closureBatchFeed`, formData, { headers });
-      
-      const response = await axiosPrivate.post(
+      const response = await axios.post(
         `${process.env.EXAM_DASHBOARD_URL}/closureBatchFeed`,
         formData,
         {
@@ -5513,7 +5568,6 @@ app.get(
     }
   }
 );
-
 
 async function generateScoreForCandidate(
   questionPaperNo,
@@ -5996,11 +6050,10 @@ async function processData(
       file: filename_sync,
     };
 
-    
     // Send data to the server
-    const response = await axiosPrivate.post(curlpath_process_data, data);
+    // const response = await axios.post(curlpath_process_data, data);
 
-    if(response.data.responseMessage=='Data updated successfully.'){
+    // if(response.data.responseMessage=='Data updated successfully.'){
     // Create ZIP file
     const process_zip_name = `${database}_${center_code}_${serverno}_${date_time}_Closure_All_Feed.zip`;
     const process_zip_path = path.join(closure_path, process_zip_name);
@@ -6075,7 +6128,7 @@ async function processData(
     }
 
     return msg || "Process Data successfully completed";
-    }
+    // }
   } catch (error) {
     console.error("Error in processData:", error.data);
     return "An error occurred while processing data.";
@@ -6160,8 +6213,8 @@ async function processFeed(
     formData.append("pass", sTaPassword);
     formData.append("CHECKSUM", reqChkSumVal);
     formData.append("file", fs.createReadStream(dmppath)); // Ensure this is a valid file path
-    
-    const response = await axiosPrivate.post(curlpath_process_feed, formData, {
+
+    const response = await axios.post(curlpath_process_feed, formData, {
       headers: {
         ...formData.getHeaders(),
       },
@@ -6350,12 +6403,11 @@ async function processSync(
     // formData.append('closure_exam_date', closure_exam_date);
     formData.append("CHECKSUM", reqChkSumVal);
     formData.append("file", fs.createReadStream(dmppath)); // Ensure this is a valid file path
-    
-    const response = await axiosPrivate.post(curlpath_sync_data, formData, {
+
+    const response = await axios.post(curlpath_sync_data, formData, {
       headers: {
         ...formData.getHeaders(),
       },
-      
     });
     console.log(response.data.responseMessage);
     // return;
@@ -6563,8 +6615,8 @@ async function downloadDBDump(
       formData.append("attendedCandidate", attend_candidate_count);
       formData.append("CHECKSUM", reqChkSumVal);
       formData.append("file", fs.createReadStream(dmppath)); // Ensure this is a valid file path
-      
-      const response = await axiosPrivate.post(
+
+      const response = await axios.post(
         curlpath_process_downloadDBDump,
         formData,
         {
@@ -6572,7 +6624,6 @@ async function downloadDBDump(
             ...formData.getHeaders(),
           },
         }
-        
       );
       console.log(response.data.responseMessage);
 
@@ -7417,11 +7468,6 @@ async function checkConsecutiveFlag(logFilePath, callback) {
 async function processAndSendFile() {
   try {
     // Check if the table exists
-    // if (!db.config.database) {
-    //   console.error("Database not selected. Skipping query.");
-    //   return res.status(404).json({ error: "Database not selected. Skipping query." });
-    // }
-    
     const tableCheckQuery = `SHOW TABLES LIKE 'feed_filenames'`;
     db.query(tableCheckQuery, async (err, tableExists) => {
       if (err) {
@@ -7509,8 +7555,7 @@ async function processAndSendFile() {
             // });
 
             try {
-              
-              const response = await axiosPrivate.post(
+              const response = await axios.post(
                 `${process.env.EXAM_DASHBOARD_URL}/feed`,
                 form,
                 {
@@ -7518,14 +7563,13 @@ async function processAndSendFile() {
                     ...form.getHeaders(),
                   },
                 }
-                
               );
 
               console.log(`Response for ${feedInfo.filename}:`, response.data);
 
               if (response.data.success == "File upload success") {
                 const updateQuery = `UPDATE feed_filenames SET status = 'Y' WHERE id = ?`;
-                // console.log(updateQuery);
+                console.log(updateQuery);
                 db.query(updateQuery, [feedInfo.id], (err) => {
                   if (err) {
                     console.error(
@@ -7689,8 +7733,7 @@ const exportTablesAsDump = async (centreCode, serialNumber) => {
       });
 
       try {
-        
-        const response = await axiosPrivate.post(
+        const response = await axios.post(
           `${process.env.EXAM_DASHBOARD_URL}/dbDumpFeed`,
           form,
           {
@@ -7698,7 +7741,6 @@ const exportTablesAsDump = async (centreCode, serialNumber) => {
               ...form.getHeaders(),
             },
           }
-         
         );
 
         // console.log(`Response for ${feedInfo.filename}:`, response.data);
@@ -7745,7 +7787,7 @@ const exportTablesAsDump = async (centreCode, serialNumber) => {
 };
 
 // Schedule the task to run every 10 minutes
-cron.schedule("*/1 * * * *", () => {
+cron.schedule("*/10 * * * *", () => {
   console.log("Running the processXmlFeed task");
   processXmlFeed();
 });
@@ -10811,8 +10853,7 @@ app.post("/exam-closure-summary", async (req, res) => {
         form.append("filename", data_config);
 
         try {
-          
-          const response = await axiosPrivate.post(
+          const response = await axios.post(
             `${process.env.EXAM_DASHBOARD_URL}/closureFeedbackFeed`,
             form,
             {
@@ -10820,7 +10861,6 @@ app.post("/exam-closure-summary", async (req, res) => {
                 ...form.getHeaders(),
               },
             }
-            
           );
 
           console.log(response.data);
@@ -14704,8 +14744,7 @@ const processBatches = async (
               };
 
               try {
-                
-                const response = await axiosPrivate.post(qpDownPath, data);
+                const response = await axios.post(qpDownPath, data);
                 const exp = response.data.message.split("^$^");
                 const status = exp[0];
 
@@ -14784,8 +14823,7 @@ const syncBiometricExamStatus = async (
         };
 
         try {
-          
-          const response = await axiosPrivate.post(qpDownPath, dataBiometric);
+          const response = await axios.post(qpDownPath, dataBiometric);
           const responseParts = response.data.message.split("^$^");
           const status = responseParts[0];
 
@@ -14850,7 +14888,13 @@ app.post('/clearQP', async (req, res) => {
     console.log(data_eal);
     // return
     
-    const response = await axiosPrivate.post(`${process.env.EXAM_DASHBOARD_URL}/autoAssignServerNumber`, data_eal);
+    const response = await axios.post(`${process.env.EXAM_DASHBOARD_URL}/autoAssignServerNumber`, data_eal, {
+      // headers: {
+      //   Authorization: `Bearer ${apiToken}`,
+      //   'Content-Type': 'application/json',
+      // },
+      // withCredentials: true,
+    });
     
     const res_eal = response.data.data?.split('^$^') || [];
     const status_eal = res_eal[0];
@@ -15472,8 +15516,8 @@ app.post("/authorization-api", async (req, res) => {
     };
 
     console.log(data);
-    
-    const response = await axiosPrivate.post(`${process.env.EXAM_DASHBOARD_URL}/authorizationApi`, data);
+
+    const response = await axios.post(`${process.env.EXAM_DASHBOARD_URL}/authorizationApi`, data);
 
     if (response.data.success == "Requested for password successfully.") {
       return res.json({ success: true, message: "Request successful", status: "1" });
@@ -15527,9 +15571,8 @@ app.post("/check-approval-status", async (req, res) => {
     };
 
     console.log(data);
-    
-    
-    const response = await axiosPrivate.post(`${process.env.EXAM_DASHBOARD_URL}/checkApprovalStatusApi`, data);
+
+    const response = await axios.post(`${process.env.EXAM_DASHBOARD_URL}/checkApprovalStatusApi`, data);
 
     console.log("approvalStatus", response.data.approvalStatus.request_status);
     if (response.data.success == "Approval status sent successfully.") {
@@ -15548,6 +15591,7 @@ app.post("/check-approval-status", async (req, res) => {
     return res.status(500).json({ error: "Internal server error" });
   }
 });
+
 app.get("/getSectionCompInCompDetails",async(req,res)=>{
   const {examCode,subjectCode,membershipNo} = req.params;
 
@@ -15576,16 +15620,9 @@ app.get("/getSectionCompInCompDetails",async(req,res)=>{
       })
     })
   }
-  const secQues = async ()=>{
-    return new Promise((resolve,reject)=>{
-        db.query("select section_code,section_name,section_type,section_duration from iib_subject_sections where subject_code= ? and online='Y' order by section_code",[subjectCode])
-  })
-  }
-  return res.json({
-    incompleteSection : getSectionIncomplete(examCode,subjectCode,membershipNo),
-    completeSection : getSectionComplete(examCode,subjectCode,membershipNo),
 
-  })
+
+
 })
 process.on("uncaughtException", (err) => {
   console.error("Uncaught Exception:", err);
@@ -15594,21 +15631,7 @@ process.on("uncaughtException", (err) => {
 process.on("unhandledRejection", (reason, promise) => {
   console.error("Unhandled Rejection at:", promise, "reason:", reason);
 });
-const checkSignDownloaded = async () => {
-  return new Promise((resolve, reject) => {
 
-    // if (!db.config.database) {
-    //   console.error("Database not selected. Skipping query.");
-    //   return resolve(false); // Don't run the query
-    // }
-
-    const query = "SELECT COUNT(*) AS count FROM qp_download WHERE download_sec = 'Sign' AND download_status = 'D'";
-    db.query(query, (err, results) => {
-      if (err) return reject(err);
-      resolve(results[0].count > 0); // Returns true if "Sign" is downloaded
-    });
-  });
-};
 // server.listen(port,'0.0.0.0',() => {
 //   console.log(`Server is running on port ${port}`);
 // });

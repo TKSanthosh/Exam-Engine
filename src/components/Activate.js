@@ -636,7 +636,8 @@ const handleValidAccess  = async (vaaccess) => {
       }
       // Make Axios request
       const response = await axios.post(
-        `http://localhost:5000/activate/${status}/${batch}/${serialNumber}/${qpStatus}`
+        `http://localhost:5000/activate/${status}/${batch}/${serialNumber}/${qpStatus}`,{},
+        {withCredentials:true}
       );
       console.log("Response from activate:", response);
       // alert(JSON.stringify(response.data))

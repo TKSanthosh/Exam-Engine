@@ -18,7 +18,6 @@
 --
 -- Dumping data for table `iib_sq_details`
 --
--- WHERE:  subject_code IN (105,106)
 
 LOCK TABLES `iib_sq_details` WRITE;
 /*!40000 ALTER TABLE `iib_sq_details` DISABLE KEYS */;
@@ -29,7 +28,6 @@ UNLOCK TABLES;
 --
 -- Dumping data for table `iib_sc_details`
 --
--- WHERE:  subject_code IN (105,106)
 
 LOCK TABLES `iib_sc_details` WRITE;
 /*!40000 ALTER TABLE `iib_sc_details` DISABLE KEYS */;
@@ -40,7 +38,6 @@ UNLOCK TABLES;
 --
 -- Dumping data for table `iib_sq_unicode_details`
 --
--- WHERE:  subject_code IN (105,106)
 
 LOCK TABLES `iib_sq_unicode_details` WRITE;
 /*!40000 ALTER TABLE `iib_sq_unicode_details` DISABLE KEYS */;
@@ -51,7 +48,6 @@ UNLOCK TABLES;
 --
 -- Dumping data for table `iib_sc_unicode_details`
 --
--- WHERE:  subject_code IN (105,106)
 
 LOCK TABLES `iib_sc_unicode_details` WRITE;
 /*!40000 ALTER TABLE `iib_sc_unicode_details` DISABLE KEYS */;
@@ -62,7 +58,6 @@ UNLOCK TABLES;
 --
 -- Dumping data for table `iib_qp_weightage`
 --
--- WHERE:  subject_code IN (105,106)
 
 LOCK TABLES `iib_qp_weightage` WRITE;
 /*!40000 ALTER TABLE `iib_qp_weightage` DISABLE KEYS */;
@@ -79,5 +74,5 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-03-20 15:15:03
+-- Dump completed on 2025-03-21 11:01:46
 UPDATE iib_exam_subjects SET qp_encry_key='123456' WHERE subject_code IN (105,106); 
